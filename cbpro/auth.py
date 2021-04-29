@@ -1,25 +1,6 @@
-# For public requests to the Coinbase exchange
-# Copyright (c) 2017 Daniel Paquin
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 #
 # source: https://docs.pro.coinbase.com/?python#signing-a-message
+#
 from requests.auth import AuthBase
 from requests.models import PreparedRequest
 
@@ -48,10 +29,19 @@ class Token(object):
         return self.__passphrase
 
 
+# Your timestamp must be within 30 seconds of the api service time or your
+# request will be considered expired and rejected. We recommend using the
+# time endpoint to query for the API server time if you believe there many
+# be time skew between your server and the API servers.
+# source: https://docs.pro.coinbase.com/?python#selecting-a-timestamp
 class Payload(object):
     def __init__(self, request: PreparedRequest) -> None:
         self.__request = request
         self.__timestamp = str(time.time())
+
+    @property
+    def request(self):
+        return self.__request
 
     @property
     def timestamp(self) -> str:
@@ -59,32 +49,43 @@ class Payload(object):
 
     @property
     def message(self) -> bytes:
-        method = self.__request.method
-        path = self.__request.path_url
-        body = self.__request.body or ''
-        timestamp = self.__timestamp
+        method = self.request.method
+        path = self.request.path_url
+        body = self.request.body or ''
+        timestamp = self.timestamp
         return f'{timestamp}{method}{path}{body}'.encode('ascii')
 
 
 class Header(object):
     def __init__(self, token: Token, payload: Payload) -> None:
-        hmac_key = base64.b64decode(token.secret)
-        signature = hmac.new(
-            hmac_key, payload.message, hashlib.sha256)
-
         self.__token = token
         self.__payload = payload
-        self.__signature = base64.b64encode(
-            signature.digest()).decode('utf-8')
+
+    @property
+    def token(self):
+        return self.__token
+
+    @property
+    def payload(self):
+        return self.__payload
+
+    @property
+    def signature(self):
+        key = base64.b64decode(self.token.secret)
+        signature = hmac.new(
+            key, self.payload.message, hashlib.sha256
+        )
+        digest = signature.digest()
+        return base64.b64encode(digest).decode('utf-8')
 
     @property
     def content(self) -> dict:
         return {
             'Content-Type': 'Application/JSON',
-            'CB-ACCESS-SIGN': self.__signature,
-            'CB-ACCESS-TIMESTAMP': self.__payload.timestamp,
-            'CB-ACCESS-KEY': self.__token.key,
-            'CB-ACCESS-PASSPHRASE': self.__token.passphrase
+            'CB-ACCESS-SIGN': self.signature,
+            'CB-ACCESS-TIMESTAMP': self.payload.timestamp,
+            'CB-ACCESS-KEY': self.token.key,
+            'CB-ACCESS-PASSPHRASE': self.token.passphrase
         }
 
 
@@ -94,6 +95,10 @@ class Auth(AuthBase):
 
     def __call__(self, request: PreparedRequest) -> PreparedRequest:
         payload = Payload(request)
-        header = Header(self.__token, payload)
+        header = Header(self.token, payload)
         request.headers.update(header.content)
         return request
+
+    @property
+    def token(self):
+        return self.__token
