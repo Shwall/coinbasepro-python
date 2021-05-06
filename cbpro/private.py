@@ -1,3 +1,4 @@
+import cbpro.auth
 import cbpro.messenger
 import cbpro.public
 
@@ -17,16 +18,16 @@ class Accounts(cbpro.messenger.Subscriber):
 
 
 class Orders(cbpro.messenger.Subscriber):
-    def post(self, **json: dict) -> dict:
+    def post(self, json: dict) -> dict:
         return self.messenger.post('/orders', json=json)
 
-    def cancel(self, id: str, **params: dict) -> list:
+    def cancel(self, id: str, params: dict = None) -> list:
         return self.messenger.delete(f'/orders/{id}', params=params)
 
-    def cancel_client(self, oid: str, **params: dict) -> list:
+    def cancel_client(self, oid: str, params: dict = None) -> list:
         return self.messenger.delete(f'/orders/client:{oid}', params=params)
 
-    def cancel_all(self, **params: dict) -> list:
+    def cancel_all(self, params: dict = None) -> list:
         return self.messenger.delete('/orders', params=params)
 
     def list(self, **params: dict) -> list:
@@ -138,3 +139,9 @@ class PrivateClient(cbpro.public.PublicClient):
         self.reports = Reports(messenger)
         self.profiles = Profiles(messenger)
         self.oracle = Oracle(messenger)
+
+
+def private_client(key, secret, passphrase, url=None):
+    auth = cbpro.auth.Auth(key, secret, passphrase)
+    messenger = cbpro.messenger.Messenger(auth=auth, url=url)
+    return PrivateClient(messenger)

@@ -1,13 +1,16 @@
 import cbpro.utils
-import cbpro.test
+import cbpro.check
 
 
+#################
+# Public Models #
+#################
 class ProductsModel(object):
     def order_book(self, level: int = None) -> dict:
         if level is None:
             return None
 
-        cbpro.test.products_order_book(level)
+        cbpro.check.products_order_book(level)
 
         return {'level': level}
 
@@ -19,43 +22,48 @@ class ProductsModel(object):
         params = dict()
 
         if start or end:
+            cbpro.check.products_history_range(start, end)
             params['start'] = start
             params['end'] = end
 
-            cbpro.test.products_history_range(start, end)
-
+        cbpro.check.products_history_granularity(granularity)
         params['granularity'] = granularity
-
-        cbpro.test.products_history_granularity(granularity)
-
         return params
 
 
+class PublicModel(object):
+    def __init__(self):
+        self.products = ProductsModel()
+
+
+##################
+# Private Models #
+##################
 class OrdersModel(object):
     def base(self,
-             product_id: str,
              side: str,
+             product_id: str,
              type_: str = None,
              client_oid: str = None,
              stp: str = None,
              stop: str = None,
              stop_price: float = None) -> dict:
 
-        cbpro.test.orders_base_side(side)
+        cbpro.check.orders_base_side(side)
 
         if type_:
-            cbpro.test.orders_base_type(type_)
+            cbpro.check.orders_base_type(type_)
 
         if stp:
-            cbpro.test.orders_base_stp(stp)
+            cbpro.check.orders_base_stp(stp)
 
         if stop or stop_price:
-            cbpro.test.orders_base_stop_price(stop, stop_price)
-            cbpro.test.orders_base_stop(stop)
+            cbpro.check.orders_base_stop(stop)
+            cbpro.check.orders_base_stop_price(stop, stop_price)
 
         params = {
-            'product_id': product_id,
             'side': side,
+            'product_id': product_id,
             'type': type_,
             'client_oid': client_oid,
             'stp': stp,
@@ -63,100 +71,66 @@ class OrdersModel(object):
             'stop_price': stop_price
         }
 
-        params = cbpro.utils.filter_empty(params)
-
-        return params
+        return cbpro.utils.filter_empty(params)
 
     def limit(self,
-              product_id: str,
               side: str,
+              product_id: str,
               price: float,
               size: float,
               time_in_force: str = None,
               cancel_after: str = None,
               post_only: bool = None,
-              type_: str = None,
               client_oid: str = None,
               stp: str = None,
               stop: str = None,
               stop_price: float = None) -> dict:
 
-        cbpro.test.orders_base_side(side)
-
-        if type_:
-            cbpro.test.orders_base_type(type_)
-
-        if stp:
-            cbpro.test.orders_base_stp(stp)
-
-        if stop or stop_price:
-            cbpro.test.orders_base_stop_price(stop, stop_price)
-            cbpro.test.orders_base_stop(stop)
+        params = self.base(
+            side, product_id, 'limit', client_oid, stp, stop, stop_price
+        )
 
         if time_in_force:
-            cbpro.test.orders_limit_ioc_or_fok(time_in_force)
-            cbpro.test.orders_limit_time_in_force(time_in_force)
+            cbpro.check.orders_limit_time_in_force(time_in_force)
 
-        params = {
-            'product_id': product_id,
-            'side': side,
+        if cancel_after:
+            cbpro.check.orders_limit_cancel_after(time_in_force)
+
+        if post_only:
+            cbpro.check.orders_limit_post_only(time_in_force)
+
+        params.update({
             'price': price,
             'size': size,
             'time_in_force': time_in_force,
             'cancel_after': cancel_after,
             'post_only': post_only,
-            'type': type_,
-            'client_oid': client_oid,
-            'stp': stp,
-            'stop': stop,
-            'stop_price': stop_price
-        }
+        })
 
-        params = cbpro.utils.filter_empty(params)
-
-        return params
+        return cbpro.utils.filter_empty(params)
 
     def market(self,
-               product_id: str,
                side: str,
+               product_id: str,
                size: float = None,
                funds: float = None,
-               type_: str = None,
                client_oid: str = None,
                stp: str = None,
                stop: str = None,
                stop_price: float = None) -> dict:
 
-        cbpro.test.orders_base_side(side)
+        params = self.base(
+            side, product_id, 'market', client_oid, stp, stop, stop_price
+        )
 
-        if size or funds:
-            cbpro.test.orders_market_size_or_funds(size, funds)
+        cbpro.check.orders_market_size_or_funds(size, funds)
 
-        if type_:
-            cbpro.test.orders_base_type(type_)
-
-        if stp:
-            cbpro.test.orders_base_stp(stp)
-
-        if stop or stop_price:
-            cbpro.test.orders_base_stop_price(stop, stop_price)
-            cbpro.test.orders_base_stop(stop)
-
-        params = {
-            'product_id': product_id,
-            'side': side,
+        params.update({
             'size': size,
             'funds': funds,
-            'type': type_,
-            'client_oid': client_oid,
-            'stp': stp,
-            'stop': stop,
-            'stop_price': stop_price
-        }
+        })
 
-        params = cbpro.utils.filter_empty(params)
-
-        return params
+        return cbpro.utils.filter_empty(params)
 
     def cancel(self, product_id: str = None) -> dict:
         if product_id is None:
@@ -165,21 +139,19 @@ class OrdersModel(object):
         return {'product_id': product_id}
 
     def list(self, status: str, product_id: str = None) -> dict:
-        cbpro.test.orders_list_status(status)
+        cbpro.check.orders_list_status(status)
 
-        params = {
+        params = cbpro.utils.filter_empty({
             'status': status,
             'product_id': product_id
-        }
-
-        params = cbpro.utils.filter_empty(params)
+        })
 
         return params
 
 
 class FillsModel(object):
     def get(self, product_id: str = None, order_id: str = None) -> dict:
-        cbpro.test.fills_get_id(product_id, order_id)
+        cbpro.check.fills_get_id(product_id, order_id)
 
         if product_id:
             return {'product_id': product_id}
@@ -196,11 +168,6 @@ class DepositsModel(object):
              limit: int = None) -> dict:
 
         return None
-
-
-class PublicModel(object):
-    def __init__(self):
-        self.products = ProductsModel()
 
 
 class PrivateModel(PublicModel):

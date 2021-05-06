@@ -8,7 +8,7 @@ class Products(cbpro.messenger.Subscriber):
     def get(self, product_id: str) -> dict:
         return self.messenger.get(f'/products/{product_id}')
 
-    def order_book(self, product_id: str, **params: dict) -> dict:
+    def order_book(self, product_id: str, params: dict = None) -> dict:
         # NOTE:
         #   - This request is not paginated
         #   - Polling is discouraged for this method
@@ -26,7 +26,7 @@ class Products(cbpro.messenger.Subscriber):
     def trades(self, product_id: str) -> list:
         return self.messenger.paginate(f'/products/{product_id}/trades')
 
-    def history(self, product_id: str, **params: dict) -> list:
+    def history(self, product_id: str, params: dict = None) -> list:
         # NOTE:
         #   - Polling is discouraged for this method
         #   - Use the websocket stream for polling instead
@@ -55,10 +55,13 @@ class Time(cbpro.messenger.Subscriber):
         return self.messenger.get('/time')
 
 
-class PublicClient(cbpro.messenger.Subscriber):
+class PublicClient(object):
     def __init__(self, messenger: cbpro.messenger.Messenger) -> None:
-        super(PublicClient, self).__init__(messenger)
-
         self.products = Products(messenger)
         self.currencies = Currencies(messenger)
         self.time = Time(messenger)
+
+
+def public_client(url=None):
+    messenger = cbpro.messenger.Messenger(url=url)
+    return PublicClient(messenger)

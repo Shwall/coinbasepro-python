@@ -1,12 +1,19 @@
-# coinbasepro-python
+# Coinbase Pro Python
+
 [![Build Status](https://travis-ci.org/danpaquin/coinbasepro-python.svg?branch=master)](https://travis-ci.org/danpaquin/coinbasepro-python)
 
-The Python client for the [Coinbase Pro API](https://docs.pro.coinbase.com/) (formerly known as
-the GDAX)
+A Python 3 Wrapper Client for the [Coinbase Pro API](https://docs.pro.coinbase.com/)
 
-##### Provided under MIT License by Daniel Paquin.
-*Note: this library may be subtly broken or buggy. The code is released under
-the MIT License – please take the following message to heart:*
+- Requires Python 3.6 or greater
+
+- Provided under MIT License by Daniel Paquin.
+
+*Note: This library may be subtly broken or buggy.*
+
+*NOTE: This library is a fork of the original. This library will resemble the original less over time as development continues. The API is not compatible with the original and will break your client interface. If you are here looking for the original GDAX project, you can [find it here](https://github.com/danpaquin/coinbasepro-python.git). I have left the the original `LICENSE` and `contributors.txt` files to credit the original author as well as the projects contributors.*
+
+*The code is released under the MIT License – please take the following message to heart:*
+
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -15,6 +22,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## Benefits
+
 - A simple to use python wrapper for both public and authenticated endpoints.
 - In about 10 minutes, you could be programmatically trading on one of the
 largest Bitcoin exchanges in the *world*!
@@ -24,152 +32,407 @@ for every API endpoint.
 what and who is behind every tick.
 
 ## Under Development
+
 - Test Scripts
-- Additional Functionality for the real-time order book
+- Real-Time Order Book
+- Web Socket Client
 - FIX API Client **Looking for assistance**
 
-## Getting Started
-This README is documentation on the syntax of the python client presented in
-this repository. See function docstrings for full syntax details.  
-**This API attempts to present a clean interface to CB Pro, but in order to use it
-to its full potential, you must familiarize yourself with the official CB Pro
-documentation.**
+# Getting Started
 
-- https://docs.pro.coinbase.com/
+This `README.md` is documentation on the syntax of the python client presented in
+this repository.
 
-- You may manually install the project or use ```pip```:
-```python
-pip install cbpro
-#or
-pip install git+git://github.com/danpaquin/coinbasepro-python.git
+See both Requests and Coinbase Pro API Documentation for full details.
+
+- [Requests API Docs](https://docs.python-requests.org/en/master/api/)
+
+Make sure you have a good grasp of the basic `requests` API for handling API `response` objects.
+
+- [Coinbase Pro API Docs](https://docs.pro.coinbase.com)
+
+You must familiarize yourself with the Official Coinbase Pro documentation in order to use it to its full potential even though this interface attempts to present a clean interface to the Coinbase Pro API.
+
+# Install
+
+*__NOTE__: This library conflicts with the original `coinbasepro-python` package. Make sure to remove it before installing this package to avoid package conflicts.*
+
+- Install manually
+
+```sh
+git clone https://github.com/teleprint-me/coinbasepro-python.git
 ```
 
-### Public Client
-Only some endpoints in the API are available to everyone.  The public endpoints
-can be reached using ```PublicClient```
+- Install with `pip`
 
-```python
-import cbpro
-public_client = cbpro.PublicClient()
+```sh
+pip install git+git://github.com/teleprint-me/coinbasepro-python.git
 ```
 
-### PublicClient Methods
-- [get_products](https://docs.pro.coinbase.com//#get-products)
-```python
-public_client.get_products()
-```
+# API
 
-- [get_product_order_book](https://docs.pro.coinbase.com/#get-product-order-book)
-```python
-# Get the order book at the default level.
-public_client.get_product_order_book('BTC-USD')
-# Get the order book at a specific level.
-public_client.get_product_order_book('BTC-USD', level=1)
-```
+*__WARNING__: It's recommended that you use the websocket interface instead of polling the general interface methods. It's best to reference the Coinbase Pro API Docs to see where polling is allowed, or even encouraged, in some niche cases. Polling can result in blocking, or even banning, access to the API in most other cases.*
 
-- [get_product_ticker](https://docs.pro.coinbase.com/#get-product-ticker)
-```python
-# Get the product ticker for a specific product.
-public_client.get_product_ticker(product_id='ETH-USD')
-```
+## `cbpro.auth.Auth`
 
-- [get_product_trades](https://docs.pro.coinbase.com/#get-trades) (paginated)
-```python
-# Get the product trades for a specific product.
-# Returns a generator
-public_client.get_product_trades(product_id='ETH-USD')
-```
+- [Authentication](https://docs.pro.coinbase.com/#authentication)
 
-- [get_product_historic_rates](https://docs.pro.coinbase.com/#get-historic-rates)
-```python
-public_client.get_product_historic_rates('ETH-USD')
-# To include other parameters, see function docstring:
-public_client.get_product_historic_rates('ETH-USD', granularity=3000)
-```
-
-- [get_product_24hr_stats](https://docs.pro.coinbase.com/#get-24hr-stats)
-```python
-public_client.get_product_24hr_stats('ETH-USD')
-```
-
-- [get_currencies](https://docs.pro.coinbase.com/#get-currencies)
-```python
-public_client.get_currencies()
-```
-
-- [get_time](https://docs.pro.coinbase.com/#time)
-```python
-public_client.get_time()
-```
-
-### Authenticated Client
-
-Not all API endpoints are available to everyone.
-Those requiring user authentication can be reached using `AuthenticatedClient`.
-You must setup API access within your
-[account settings](https://pro.coinbase.com/profile/api).
-The `AuthenticatedClient` inherits all methods from the `PublicClient`
-class, so you will only need to initialize one if you are planning to
-integrate both into your script.
+Use the `cbpro.auth.Auth` object to authenticate yourself with private endpoints.
 
 ```python
 import cbpro
-auth_client = cbpro.AuthenticatedClient(key, b64secret, passphrase)
-# Use the sandbox API (requires a different set of API access credentials)
-auth_client = cbpro.AuthenticatedClient(key, b64secret, passphrase,
-                                  api_url="https://api-public.sandbox.pro.coinbase.com")
+
+KEY = 'My Key'
+SECRET = 'My Secret'
+PASSPHRASE = 'My Passphrase'
+
+auth = cbpro.Auth(KEY, SECRET, PASSPHRASE)
 ```
 
-### Pagination
-Some calls are [paginated](https://docs.pro.coinbase.com/#pagination), meaning multiple
-calls must be made to receive the full set of data. The CB Pro Python API provides
-an abstraction for paginated endpoints in the form of generators which provide a
-clean interface for iteration but may make multiple HTTP requests behind the 
-scenes. The pagination options `before`, `after`, and `limit` may be supplied as
-keyword arguments if desired, but aren't necessary for typical use cases.
+## `cbpro.messenger.Messenger`
+
+- [Requests](https://docs.pro.coinbase.com/#requests) 
+
+The `Messenger` object is a wrapper that handles making client requests a bit simpler. The `Messenger` object also handles converting a `dict` object to a json compatible object using `json.dumps` internally. 
+
+All `Messenger` object methods return a `requests.models.Response` object. The only exception to this rule is the `Messenger.paginate` method which returns a generator.
+
+Any objects that subscribe to the `Subscriber` interface inherit the initialization of the `Subscriber.messenger` property allowing them to effectively communicate via the same `Auth` and `requests.Session` objects without duplicating code.
+
+This basically means **all** client interfaces inherit from the `Subscriber` object. They all share the same information without communicating directly with one another because they all have their own access to the intial `Messenger` object.
+
+It's highly recommended to use either the `PublicClient` or the `PrivateClient` as a mediator for the `Messenger` object rather than utilizing it directly.
+
+*__NOTE__: The `Messenger` object is __not__ a Singleton structure.*
+
+A `Messenger` instance is passed to the `PublicClient` or `PrivateClient` objects and then shared among the related classes during instantiation of Client related object. Each instance having their own memory space and sharing the same `Messenger` instance.
+
+Use the `cbpro.messenger.Messenger` object to communicate with the [Coinbase Pro API](https://docs.pro.coinbase.com/).
+
 ```python
-fills_gen = auth_client.get_fills()
-# Get all fills (will possibly make multiple HTTP requests)
-all_fills = list(fills_gen)
+import cbpro
+
+messenger = cbpro.Messenger()
 ```
-One use case for pagination parameters worth pointing out is retrieving only 
-new data since the previous request. For the case of `get_fills()`, the 
-`trade_id` is the parameter used for indexing. By passing 
-`before=some_trade_id`, only fills more recent than that `trade_id` will be 
-returned. Note that when using `before`, a maximum of 100 entries will be 
-returned - this is a limitation of CB Pro.
+
+Use the `cbpro.auth.Auth` object to allow the `cbpro.messenger.Messenger` object
+to communicate with private endpoints.
+
+```python
+KEY = 'My Key'
+SECRET = 'My Secret'
+PASSPHRASE = 'My Passphrase'
+
+auth = cbpro.Auth(KEY, SECRET, PASSPHRASE)
+messenger = cbpro.Messenger(auth=auth)
+```
+
+Use the [Coinbase Pro Rest API Sandbox](https://docs.pro.coinbase.com/#sandbox) for testing.
+
+```python
+url = 'https://api-public.sandbox.pro.coinbase.com'
+auth = cbpro.Auth(KEY, SECRET, PASSPHRASE)
+messenger = cbpro.Messenger(auth=auth, url=url)
+```
+
+### `cbpro.messenger.Messenger.paginate`
+
+Some calls are [paginated](https://docs.pro.coinbase.com/#pagination). Multiple
+calls must be made to receive the full set of data. The `Messenger` interface provides
+a method for paginated endpoints. `Messenger.paginate` returns a generator which provide a clean interface for iteration and may make multiple HTTP requests behind the scenes.
+
+The pagination options `before`, `after`, and `limit` may be supplied as keyword arguments if desired and are not necessary for typical use cases.
+
+```python
+generator = private.fills.get()
+fills = list(generator)
+```
+
+One use case worth pointing out is retrieving only new data since the previous request. 
+
+The `trade_id` is the parameter used for indexing `private.fills.get()`. If passing `before=some_trade_id`, then only fills more recent than that `trade_id` will be returned.
+
+Note that a maximum of 100 entries will be returned when using `before` - this is a limitation set by Coinbase Pro.
+
 ```python
 from itertools import islice
 # Get 5 most recent fills
-recent_fills = islice(auth_client.get_fills(), 5)
+recent_fills = islice(private.fills.get(), 5)
 # Only fetch new fills since last call by utilizing `before` parameter.
-new_fills = auth_client.get_fills(before=recent_fills[0]['trade_id'])
+new_fills = private.fills.get(before=recent_fills[0]['trade_id'])
 ```
 
-### AuthenticatedClient Methods
-- [get_accounts](https://docs.pro.coinbase.com/#list-accounts)
+## `cbpro.public.PublicClient`
+
+- [Coinbase Pro API Market Data](https://docs.pro.coinbase.com/#market-data)
+
+Only some endpoints in the API are available to everyone.  The public endpoints
+can be reached using `cbpro.public.PublicClient` object.
+
 ```python
-auth_client.get_accounts()
+cbpro.public.PublicClient(
+    messenger: cbpro.messenger.Messenger
+) -> cbpro.public.PublicClient
 ```
 
-- [get_account](https://docs.pro.coinbase.com/#get-an-account)
+Example:
+
 ```python
-auth_client.get_account("7d0f7d8e-dd34-4d9c-a846-06f431c381ba")
+import cbpro
+
+messenger = cbpro.Messenger()
+
+public = cbpro.PublicClient(messenger)
+
+response = public.products.list()
+
+type(response)
+# <class 'requests.models.Response'>
+
+response
+# <Response [200]>
+
+products = response.json()
+
+type(products)
+# <class 'list'>
+
+len(products)
+# 183
 ```
 
-- [get_account_history](https://docs.pro.coinbase.com/#get-account-history) (paginated)
+### `cbpro.public.Products`
+
+- [Products](https://docs.pro.coinbase.com/#products)
+
 ```python
-# Returns generator:
-auth_client.get_account_history("7d0f7d8e-dd34-4d9c-a846-06f431c381ba")
+public.products
 ```
 
-- [get_account_holds](https://docs.pro.coinbase.com/#get-holds) (paginated)
+- [Get Products](https://docs.pro.coinbase.com/#get-products)
+
 ```python
-# Returns generator:
-auth_client.get_account_holds("7d0f7d8e-dd34-4d9c-a846-06f431c381ba")
+public.products.list() -> list
 ```
 
-- [buy & sell](https://docs.pro.coinbase.com/#place-a-new-order)
+- [Get Single Product](https://docs.pro.coinbase.com/#get-single-product)
+
+```python
+public.products.get(product_id: str) -> dict
+```
+
+Example:
+
+```python
+product_id = 'BTC-USD'
+
+response = public.products.get(product_id)
+
+product = response.json()
+
+type(product)
+# <class 'dict'>
+```
+
+- [Get Product Order Book](https://docs.pro.coinbase.com/#get-product-order-book)
+
+```python
+public.products.order_book(product_id: str, **params: dict) -> dict
+```
+
+Example:
+
+```python
+response = public.products.order_book(product_id)
+result = response.json()
+
+type(result)
+# <class 'dict'>
+
+result
+# {
+#   'bids': [['53120.08', '0.13374181', 1]], 
+#   'asks': [['53120.09', '0.17580828', 4]], 
+#   'sequence': 24328438628
+# }
+```
+
+- [Get Product Ticker](https://docs.pro.coinbase.com/#get-product-ticker)
+
+```python
+public.product.ticker(product_id: str) -> dict
+```
+
+- [Get Trades](https://docs.pro.coinbase.com/#get-trades)
+
+```python
+public.products.trades(product_id: str) -> list
+```
+
+- [Get Historic Rates](https://docs.pro.coinbase.com/#get-historic-rates)
+
+```python
+public.products.history(product_id: str, **params: dict) -> list
+```
+
+- [Get 24hr Stats](https://docs.pro.coinbase.com/#get-24hr-stats)
+
+```python
+public.products.stats(product_id: str) -> dict
+```
+
+### `cbpro.public.Currencies`
+
+- [Get Currencies](https://docs.pro.coinbase.com/#get-currencies)
+
+```python
+public.currencies.list() -> list
+```
+
+- [Get a currency](https://docs.pro.coinbase.com/#get-a-currency)
+
+```python
+public.currencies.get(product_id: str) -> dict
+```
+
+### `cbpro.public.Time`
+
+- [Time](https://docs.pro.coinbase.com/#time)
+
+```python
+public.time.get() -> dict
+```
+
+## `cbpro.models.PublicModel`
+
+Use `cbpro.models.PublicModel` to generate passable parameters easily.
+
+```python
+cbpro.models.PublicModel() -> cbpro.models.PublicModel
+```
+
+Example:
+
+```python
+# Get the order book at a specific level.
+import cbpro.models
+
+model = cbpro.models.PublicModel()
+
+params = model.products.order_book(2)
+params
+# {'level': 2}
+
+response = public.products.order_book(product_id, params=params)
+response
+# <Response [200]>
+ 
+result = response.json()
+type(result)
+# <class 'dict'>
+
+result
+# {
+#   'bids': [['53009.87', '0.35148662', 2]], 
+#   'asks': [['53011.25', '0.002', 1]], 
+#   'sequence': 24328747726
+# }
+```
+
+### `cbpro.models.ProductsModel`
+
+- [Order Book Parameters](https://docs.pro.coinbase.com/#get-product-order-book)
+
+```python
+model.products.order_book(level: int = None) -> dict
+```
+
+- [History Parameters](https://docs.pro.coinbase.com/#get-historic-rates)
+
+```python
+model.products.history(start: str = None, 
+                       end: str = None, 
+                       granularity: int = 86400) -> dict
+```
+
+## `cbpro.private.PrivateClient`
+
+Not all API endpoints are available to everyone.
+Those requiring user authentication can be reached using the `PrivateClient` object. You must setup API access within your
+[Account Settings](https://pro.coinbase.com/profile/api).
+
+The `PrivateClient` object inherits all properties from the `PublicClient`
+object. You will only need to initialize one if you are planning to
+integrate both into your script.
+
+Example:
+
+```python
+import cbpro
+
+KEY = 'My Key'
+SECRET = 'My Secret'
+PASSPHRASE = 'My Passphrase'
+
+auth = cbpro.Auth(KEY, SECRET, PASSPHRASE)
+messenger = cbpro.Messenger(auth=auth)
+private = cbpro.PrivateClient(messenger)
+
+response = private.products.list()
+
+type(response)
+# <class 'requests.models.Response'>
+
+response
+# <Response [200]>
+
+products = response.json()
+
+type(products)
+# <class 'list'>
+
+len(products)
+# 183
+```
+
+### `cbpro.private.Accounts`
+
+- [List Accounts](https://docs.pro.coinbase.com/#list-accounts)
+
+```python
+private.accounts.list() -> list
+```
+
+- [Get an Account](https://docs.pro.coinbase.com/#get-an-account)
+
+```python
+private.accounts.get(account_id: str) -> dict
+```
+
+- [Get Account History](https://docs.pro.coinbase.com/#get-account-history)
+
+```python
+# Returns generator
+private.accounts.history(account_id: str) -> list
+```
+
+- [Get Holds](https://docs.pro.coinbase.com/#get-holds)
+
+```python
+# Returns generator
+private.accounts.holds(account_id: str) -> list
+```
+
+### `cbpro.private.Orders`
+
+- [Place a New Order](https://docs.pro.coinbase.com/#place-a-new-order)
+
+```python
+private.orders.post(**json: dict) -> dict
+```
+
+Example:
+
 ```python
 # Buy 0.01 BTC @ 100 USD
 auth_client.buy(price='100.00', #USD
