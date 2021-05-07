@@ -40,7 +40,7 @@ def get_timestamp() -> str:
     return str(time.time())
 
 
-def get_request_body(request: PreparedRequest):
+def get_request_body(request: PreparedRequest) -> str:
     return '' if request.body is None else request.body.decode('utf-8')
 
 
@@ -58,7 +58,7 @@ def get_b64signature(message: str, token: Token) -> bytes:
     return b64signature.decode('utf-8')
 
 
-def get_headers(timestamp: str, b64signature: bytes, token: Token):
+def get_headers(timestamp: str, b64signature: bytes, token: Token) -> dict:
     return {
         'CB-ACCESS-SIGN': b64signature,
         'CB-ACCESS-TIMESTAMP': timestamp,
@@ -72,7 +72,7 @@ class Auth(AuthBase):
     def __init__(self, key, secret, passphrase):
         self.token = Token(key, secret, passphrase)
 
-    def __call__(self, request):
+    def __call__(self, request: PreparedRequest) -> PreparedRequest:
         timestamp = get_timestamp()
         message = get_message(timestamp, request)
         b64signature = get_b64signature(message, self.token)
