@@ -1,5 +1,3 @@
-from json import dumps
-
 import requests
 import cbpro.auth
 
@@ -24,38 +22,41 @@ class Messenger(object):
     def get(self, endpoint: str, params: dict = None) -> dict:
         url = self.route(endpoint)
 
-        return self.session.get(
+        response = self.session.get(
             url,
             params=params,
             auth=self.auth,
             timeout=self.timeout
-        ).json()
+        )
+
+        return response.json()
 
     def post(self,
              endpoint: str,
              params: dict = None,
              json: dict = None) -> dict:
 
-        url = self.route(endpoint)
-        json = json if json is None else dumps(json)
-
-        return self.session.post(
-            url,
+        response = self.session.post(
+            url=self.route(endpoint),
             params=params,
             json=json,
             auth=self.auth,
             timeout=self.timeout
-        ).json()
+        )
+
+        return response.json()
 
     def delete(self, endpoint: str, **kwargs: dict) -> dict:
         url = self.route(endpoint)
 
-        return self.session.delete(
+        response = self.session.delete(
             url,
             auth=self.auth,
             timeout=self.timeout,
             **kwargs
-        ).json()
+        )
+
+        return response.json()
 
     def request(self,
                 method: str,
@@ -64,16 +65,17 @@ class Messenger(object):
                 json: dict = None) -> dict:
 
         url = self.route(endpoint)
-        json = json if json is None else dumps(json)
 
-        return self.session.request(
+        response = self.session.request(
             method,
             url,
             json=json,
             params=params,
             auth=self.auth,
             timeout=self.timeout
-        ).json()
+        )
+
+        return response.json()
 
     def paginate(self, endpoint: str, params: dict = None) -> object:
         # source: https://docs.pro.coinbase.com/?python#pagination
