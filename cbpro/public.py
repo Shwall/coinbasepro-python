@@ -23,8 +23,8 @@ class Products(cbpro.messenger.Subscriber):
         #   - Use the websocket stream for polling instead
         return self.messenger.get(f'/products/{product_id}/ticker')
 
-    def trades(self, product_id: str) -> list:
-        return self.messenger.paginate(f'/products/{product_id}/trades')
+    def trades(self, product_id: str, params: dict = None) -> list:
+        return self.messenger.paginate(f'/products/{product_id}/trades', params=params)
 
     def history(self, product_id: str, params: dict = None) -> list:
         # NOTE:

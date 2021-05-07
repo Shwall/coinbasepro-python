@@ -57,7 +57,7 @@ class Messenger(object):
             **kwargs
         ).json()
 
-    def request(self, 
+    def request(self,
                 method: str,
                 endpoint: str,
                 params: dict = None,
