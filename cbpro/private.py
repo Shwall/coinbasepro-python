@@ -10,19 +10,19 @@ class Accounts(cbpro.messenger.Subscriber):
     def get(self, account_id: str) -> dict:
         return self.messenger.get(f'/accounts/{account_id}')
 
-    def history(self, account_id: str) -> list:
-        return self.messenger.paginate(f'/accounts/{account_id}/ledger')
+    def history(self, account_id: str, params: dict = None) -> list:
+        return self.messenger.paginate(f'/accounts/{account_id}/ledger', params=params)
 
-    def holds(self, account_id: str) -> list:
-        return self.messenger.paginate(f'/accounts/{account_id}/holds')
+    def holds(self, account_id: str, params: dict = None) -> list:
+        return self.messenger.paginate(f'/accounts/{account_id}/holds', params=params)
 
 
 class Orders(cbpro.messenger.Subscriber):
     def post(self, json: dict) -> dict:
         return self.messenger.post('/orders', json=json)
 
-    def cancel(self, id: str, params: dict = None) -> list:
-        return self.messenger.delete(f'/orders/{id}', params=params)
+    def cancel(self, id_: str, params: dict = None) -> list:
+        return self.messenger.delete(f'/orders/{id_}', params=params)
 
     def cancel_client(self, oid: str, params: dict = None) -> list:
         return self.messenger.delete(f'/orders/client:{oid}', params=params)
@@ -30,19 +30,19 @@ class Orders(cbpro.messenger.Subscriber):
     def cancel_all(self, params: dict = None) -> list:
         return self.messenger.delete('/orders', params=params)
 
-    def list(self, **params: dict) -> list:
+    def list(self, params: dict) -> list:
         return self.messenger.paginate('/orders', params=params)
 
-    def get(self, id: str) -> dict:
-        return self.messenger.get(f'/orders/{id}')
+    def get(self, id_: str) -> dict:
+        return self.messenger.get(f'/orders/{id_}')
 
     def get_client(self, oid: str) -> dict:
         return self.messenger.get(f'/orders/client:{oid}')
 
 
 class Fills(cbpro.messenger.Subscriber):
-    def list(self, **params: dict) -> list:
-        self.messenger.paginate('/fills', params=params)
+    def list(self, params: dict) -> list:
+        return self.messenger.paginate('/fills', params=params)
 
 
 class Limits(cbpro.messenger.Subscriber):
@@ -51,16 +51,16 @@ class Limits(cbpro.messenger.Subscriber):
 
 
 class Deposits(cbpro.messenger.Subscriber):
-    def list(self, **params: dict) -> list:
+    def list(self, params: dict = None) -> list:
         return self.messenger.paginate('/transfers', params=params)
 
     def get(self, transfer_id: str) -> dict:
         return self.messenger.get(f'/transfers/:{transfer_id}')
 
-    def payment(self, **json: dict) -> dict:
+    def payment(self, json: dict) -> dict:
         return self.messenger.post('/deposits/payment-method', json=json)
 
-    def coinbase(self, **json: dict) -> dict:
+    def coinbase(self, json: dict) -> dict:
         return self.messenger.post('/deposits/coinbase-account', json=json)
 
     def generate(self, account_id: str) -> dict:
@@ -141,7 +141,11 @@ class PrivateClient(cbpro.public.PublicClient):
         self.oracle = Oracle(messenger)
 
 
-def private_client(key, secret, passphrase, url=None):
+def private_client(key: str,
+                   secret: str,
+                   passphrase: str,
+                   url: str = None) -> PrivateClient:
+
     auth = cbpro.auth.Auth(key, secret, passphrase)
     messenger = cbpro.messenger.Messenger(auth=auth, url=url)
     return PrivateClient(messenger)

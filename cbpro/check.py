@@ -94,7 +94,7 @@ def orders_market_size_or_funds(size, funds):
 
 
 def orders_list_status(value: str):
-    accepted = ['all', 'open', 'pending', 'active']
+    accepted = ['open', 'pending', 'active', 'done', 'all']
     message = f'`status` must be one of: {accepted}'
     assert_in(value, accepted, message)
 

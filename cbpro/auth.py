@@ -69,7 +69,7 @@ def get_headers(timestamp: str, b64signature: bytes, token: Token) -> dict:
 
 
 class Auth(AuthBase):
-    def __init__(self, key, secret, passphrase):
+    def __init__(self, key, secret, passphrase) -> None:
         self.token = Token(key, secret, passphrase)
 
     def __call__(self, request: PreparedRequest) -> PreparedRequest:
