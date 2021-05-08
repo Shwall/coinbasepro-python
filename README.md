@@ -113,7 +113,7 @@ print(json)
 
 ## `cbpro.messenger.Messenger`
 
-- [Requests](https://docs.pro.coinbase.com/#requests) 
+- [Requests](https://docs.pro.coinbase.com/#requests)
 
 ```python
 class cbpro.messenger.Messenger(auth: cbpro.auth.Auth = None,
@@ -210,12 +210,12 @@ class PublicClient(object):
 
 - [Market Data](https://docs.pro.coinbase.com/#market-data)
 
-Only some endpoints in the API are available to everyone.  The public endpoints
-can be reached using `cbpro.public.PublicClient` object.
-
 ```python
 cbpro.public.PublicClient(messenger: cbpro.messenger.Messenger)
 ```
+
+Only some endpoints in the API are available to everyone.  The public endpoints
+can be reached using `cbpro.public.PublicClient` object.
 
 Example 1:
 
@@ -225,6 +225,14 @@ import cbpro
 messenger = cbpro.Messenger()
 public = cbpro.PublicClient(messenger)
 ```
+
+### `cbpro.public.public_client`
+
+```python
+cbpro.public.public_client(url: str = None)
+```
+
+You can use the `public_client` method in most cases to simplify instantiation. `Example 2` is only one line of code where `Example 1` is 2 lines of code. They both return an instantiated `PublicClient` object either way.
 
 Example 2:
 
@@ -408,10 +416,10 @@ public.time.get() -> dict
 ## `cbpro.models.PublicModel`
 
 ```python
-cbpro.models.PublicModel() -> cbpro.models.PublicModel
+cbpro.models.PublicModel()
 ```
 
-Use `PublicModel` to generate passable parameters easily. 
+Use `PublicModel` to generate passable parameters easily.
 
 Models will help enforce your code according to what the API expects. If a parameter is incorrect, or forgotten, then the model will raise an `AssertionError`.
 
@@ -491,45 +499,62 @@ print(history)
 
 ## `cbpro.private.PrivateClient`
 
+```python
+cbpro.private.PrivateClient(messenger: cbpro.messenger.Messenger)
+```
+
 Not all API endpoints are available to everyone.
 Those requiring user authentication can be reached using the `PrivateClient` object. You must setup API access within your
 [Account Settings](https://pro.coinbase.com/profile/api).
 
-The `PrivateClient` object inherits all properties from the `PublicClient`
-object. You will only need to initialize one if you are planning to
-integrate both into your script.
+*__NOTE__: The `PrivateClient` object inherits from the `PublicClient` object.*
 
-Example:
+Example 1:
 
 ```python
 import cbpro
 
-KEY = 'My Key'
-SECRET = 'My Secret'
-PASSPHRASE = 'My Passphrase'
+key = 'My Key'
+secret = 'My Secret'
+passphrase = 'My Passphrase'
+sandbox = 'https://api-public.sandbox.pro.coinbase.com'
 
-auth = cbpro.Auth(KEY, SECRET, PASSPHRASE)
-messenger = cbpro.Messenger(auth=auth)
+auth = cbpro.Auth(key, secret, passphrase)
+messenger = cbpro.Messenger(auth=auth, url=sandbox)
 private = cbpro.PrivateClient(messenger)
-
-response = private.products.list()
-
-type(response)
-# <class 'requests.models.Response'>
-
-response
-# <Response [200]>
-
-products = response.json()
-
-type(products)
-# <class 'list'>
-
-len(products)
-# 183
 ```
 
-### `cbpro.private.Accounts`
+### `cbpro.private.private_client`
+
+```python
+cbpro.private.private_client(key: str,
+                             secret: str,
+                             passphrase: str,
+                             url: str = None) -> PrivateClient:
+```
+
+You can use the `private_client` method in most cases to simplify instantiation. `Example 2` is only one line of code where `Example 1` is 3 lines of code. They both return an instantiated `PrivateClient` object either way.
+
+Example 2:
+
+```python
+import cbpro
+
+key = 'My Key'
+secret = 'My Secret'
+passphrase = 'My Passphrase'
+sandbox = 'https://api-public.sandbox.pro.coinbase.com'
+
+private = cbpro.private_client(key, secret, passphrase, sandbox)
+```
+
+## `cbpro.private.Accounts`
+
+```python
+cbpro.private.Accounts(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Accounts.list`
 
 - [List Accounts](https://docs.pro.coinbase.com/#list-accounts)
 
@@ -537,100 +562,265 @@ len(products)
 private.accounts.list() -> list
 ```
 
+### `cbpro.private.Accounts.get`
+
 - [Get an Account](https://docs.pro.coinbase.com/#get-an-account)
 
 ```python
 private.accounts.get(account_id: str) -> dict
 ```
 
+### `cbpro.private.Accounts.history`
+
 - [Get Account History](https://docs.pro.coinbase.com/#get-account-history)
 
 ```python
-# Returns generator
-private.accounts.history(account_id: str) -> list
+# NOTE:
+#   - This request is paginated
+private.accounts.history(account_id: str, params: dict = None) -> list
 ```
+
+### `cbpro.private.Accounts.holds`
 
 - [Get Holds](https://docs.pro.coinbase.com/#get-holds)
 
 ```python
-# Returns generator
-private.accounts.holds(account_id: str) -> list
+# NOTE:
+#   - This request is paginated
+private.accounts.holds(account_id: str, params: dict = None) -> list
 ```
 
-### `cbpro.private.Orders`
+## `cbpro.private.Orders`
+
+```python
+cbpro.private.Orders(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Orders.post`
 
 - [Place a New Order](https://docs.pro.coinbase.com/#place-a-new-order)
 
 ```python
-private.orders.post(**json: dict) -> dict
+private.orders.post(json: dict) -> dict
 ```
 
-Example:
+Example: Limit Order
 
 ```python
-# Buy 0.01 BTC @ 100 USD
-auth_client.buy(price='100.00', #USD
-               size='0.01', #BTC
-               order_type='limit',
-               product_id='BTC-USD')
-```
-```python
-# Sell 0.01 BTC @ 200 USD
-auth_client.sell(price='200.00', #USD
-                size='0.01', #BTC
-                order_type='limit',
-                product_id='BTC-USD')
-```
-```python
-# Limit order-specific method
-auth_client.place_limit_order(product_id='BTC-USD', 
-                              side='buy', 
-                              price='200.00', 
-                              size='0.01')
-```
-```python
-# Place a market order by specifying amount of USD to use. 
-# Alternatively, `size` could be used to specify quantity in BTC amount.
-auth_client.place_market_order(product_id='BTC-USD', 
-                               side='buy', 
-                               funds='100.00')
-```
-```python
-# Stop order. `funds` can be used instead of `size` here.
-auth_client.place_stop_order(product_id='BTC-USD', 
-                              stop_type='loss', 
-                              price='200.00', 
-                              size='0.01')
+limit = {
+    'side': 'buy',
+    'product_id': 'BTC-USD',
+    'type': 'limit',
+    'price': 57336.2,
+    'size': 0.001
+}
+
+private.orders.post(limit)
 ```
 
-- [cancel_order](https://docs.pro.coinbase.com/#cancel-an-order)
+Example: Market Order
+
 ```python
-auth_client.cancel_order("d50ec984-77a8-460a-b958-66f114b0de9b")
+market = {
+    'side': 'buy',
+    'product_id': 'BTC-USD',
+    'type': 'market',
+    'funds': 100.0
+}
+
+private.orders.post(market)
 ```
+
+Example: Limit Stop Order
+
+```python
+stop = {
+    'side': 'buy',
+    'product_id': 'BTC-USD',
+    'type': 'limit',
+    'stop': 'loss',
+    'stop_price': 50000.0,
+    'price': 57064.8,
+    'size': 0.001
+}
+
+private.orders.post(stop)
+```
+
+Example: Market Stop Order
+
+```python
+stop = {
+    'side': 'buy',
+    'product_id': 'BTC-USD',
+    'type': 'market',
+    'stop': 'loss',
+    'stop_price': 45000.0,
+    'funds': 100.0
+}
+
+private.orders.post(stop)
+```
+
+### `cbpro.private.Orders.cancel`
+
+- [Cancel an Order](https://docs.pro.coinbase.com/#cancel-an-order)
+
+```python
+private.orders.cancel(id_: str, params: dict = None) -> list
+```
+
+### `cbpro.private.Orders.cancel_client`
+
+- [Cancel an Order](https://docs.pro.coinbase.com/#cancel-an-order)
+
+```python
+private.orders.cancel_client(oid: str, params: dict = None) -> list
+```
+
+### `cbpro.private.Orders.cancel_all`
+
 - [cancel_all](https://docs.pro.coinbase.com/#cancel-all)
+
 ```python
-auth_client.cancel_all(product_id='BTC-USD')
+private.orders.cancel_all(params: dict = None) -> list
 ```
 
-- [get_orders](https://docs.pro.coinbase.com/#list-orders) (paginated)
+### `cbpro.private.Orders.list`
+
+- [List Orders](https://docs.pro.coinbase.com/#list-orders)
+
 ```python
-# Returns generator:
-auth_client.get_orders()
+# NOTE:
+#   - This request is paginated
+private.orders.list(params: dict) -> list
 ```
 
-- [get_order](https://docs.pro.coinbase.com/#get-an-order)
+### `cbpro.private.Orders.get`
+
+- [Get an Order](https://docs.pro.coinbase.com/#get-an-order)
+
 ```python
-auth_client.get_order("d50ec984-77a8-460a-b958-66f114b0de9b")
+private.orders.get(id_: str) -> dict
 ```
 
-- [get_fills](https://docs.pro.coinbase.com/#list-fills) (paginated)
+### `cbpro.private.Orders.get_client`
+
+- [Get an Order](https://docs.pro.coinbase.com/#get-an-order)
+
 ```python
-# All return generators
-auth_client.get_fills()
-# Get fills for a specific order
-auth_client.get_fills(order_id="d50ec984-77a8-460a-b958-66f114b0de9b")
-# Get fills for a specific product
-auth_client.get_fills(product_id="ETH-BTC")
+private.orders.get_client(oid: str) -> dict
+```
+
+## `cbpro.private.Fills`
+
+```python
+cbpro.private.Fills(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Fills.list`
+
+- [List Fills](https://docs.pro.coinbase.com/#list-fills)
+
+```python
+# NOTE:
+#   - This request is paginated
+#   - You are required to provide either a `product_id` or `order_id`
+private.fills.list(params: dict) -> list
+```
+
+Example 1:
+
+```python
+product_id = {'product_id': 'BTC-USD'}
+private.fills.list(product_id)
+```
+
+Example 2:
+
+```python
+order_id = {'order_id': '0e953c31-9bce-4007-978c-302be337b566'}
+private.fills.list(order_id)
+```
+
+## `cbpro.private.Limits`
+
+```python
+cbpro.private.Limits(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Limits.get`
+
+- [Get Current Exchange Limits](https://docs.pro.coinbase.com/#get-current-exchange-limits)
+
+```python
+private.fills.get() -> dict
+```
+
+## `cbpro.private.Deposits`
+
+```python
+cbpro.private.Deposits(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Deposits.list`
+
+- [List Deposits](https://docs.pro.coinbase.com/#list-deposits)
+
+```python
+# NOTE:
+#   - This request is paginated
+private.deposits.list(params: dict = None) -> list
+```
+
+### `cbpro.private.Deposits.get`
+
+- [Single Deposit](https://docs.pro.coinbase.com/#single-deposit)
+
+```python
+private.deposits.get(transfer_id: str) -> dict
+```
+
+### `cbpro.private.Deposits.payment`
+
+- [Payment Method](https://docs.pro.coinbase.com/#payment-method)
+
+```python
+private.deposits.payment(json: dict) -> dict
+```
+
+### `cbpro.private.Deposits.coinbase`
+
+- [Coinbase](https://docs.pro.coinbase.com/#coinbase)
+
+```python
+private.deposits.coinbase(json: dict) -> dict
+```
+
+### `cbpro.private.Deposits.generate`
+
+- [Generate a Crypto Deposit Address](https://docs.pro.coinbase.com/#generate-a-crypto-deposit-address)
+
+```python
+private.deposits.generate(account_id: str) -> dict
+```
+
+## `cbpro.private.Withdrawals`
+
+```python
+cbpro.private.Withdrawals(messenger: cbpro.messenger.Messenger)
+```
+
+## `cbpro.private.Conversions`
+
+```python
+cbpro.private.Conversions(messenger: cbpro.messenger.Messenger)
+```
+
+## `cbpro.private.Payments`
+
+```python
+cbpro.private.Payments(messenger: cbpro.messenger.Messenger)
 ```
 
 - [deposit & withdraw](https://docs.pro.coinbase.com/#depositwithdraw)
