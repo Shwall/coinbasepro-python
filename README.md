@@ -680,7 +680,7 @@ private.orders.cancel_client(oid: str, params: dict = None) -> list
 
 ### `cbpro.private.Orders.cancel_all`
 
-- [cancel_all](https://docs.pro.coinbase.com/#cancel-all)
+- [Cancel All](https://docs.pro.coinbase.com/#cancel-all)
 
 ```python
 private.orders.cancel_all(params: dict = None) -> list
@@ -754,7 +754,7 @@ cbpro.private.Limits(messenger: cbpro.messenger.Messenger)
 - [Get Current Exchange Limits](https://docs.pro.coinbase.com/#get-current-exchange-limits)
 
 ```python
-private.fills.get() -> dict
+private.limits.get() -> dict
 ```
 
 ## `cbpro.private.Deposits`
@@ -808,7 +808,45 @@ private.deposits.generate(account_id: str) -> dict
 ## `cbpro.private.Withdrawals`
 
 ```python
+# NOTE:
+#   - `cbpro.private.Withdrawls` inherits from `cbpro.private.Deposits`
 cbpro.private.Withdrawals(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Withdrawals.payment`
+
+- [Payment Method](https://docs.pro.coinbase.com/#payment-method55)
+
+```python
+# NOTE:
+#   - This method is overridden
+private.withdrawals.payment(json: dict) -> dict
+```
+
+### `cbpro.private.Withdrawals.coinbase`
+
+- [Coinbase](https://docs.pro.coinbase.com/#coinbase56)
+
+```python
+# NOTE:
+#   - This method is overridden
+private.withdrawals.coinbase(json: dict) -> dict
+```
+
+### `cbpro.private.Withdrawals.crypto`
+
+- [Crypto](https://docs.pro.coinbase.com/#crypto)
+
+```python
+private.withdrawals.crypto(json: dict) -> dict
+```
+
+### `cbpro.private.Withdrawals.estimate`
+
+- [Fee Estimate](https://docs.pro.coinbase.com/#fee-estimate)
+
+```python
+private.withdrawals.estimate(params: dict) -> dict
 ```
 
 ## `cbpro.private.Conversions`
@@ -817,34 +855,109 @@ cbpro.private.Withdrawals(messenger: cbpro.messenger.Messenger)
 cbpro.private.Conversions(messenger: cbpro.messenger.Messenger)
 ```
 
+### `cbpro.private.Conversions.create`
+
+- [Create Conversion](https://docs.pro.coinbase.com/#create-conversion)
+
+```python
+private.conversions.create(json: dict) -> dict
+```
+
 ## `cbpro.private.Payments`
 
 ```python
 cbpro.private.Payments(messenger: cbpro.messenger.Messenger)
 ```
 
-- [deposit & withdraw](https://docs.pro.coinbase.com/#depositwithdraw)
+### `cbpro.private.Payments.list`
+
+- [List Payment Methods](https://docs.pro.coinbase.com/#list-payment-methods)
+
 ```python
-depositParams = {
-        'amount': '25.00', # Currency determined by account specified
-        'coinbase_account_id': '60680c98bfe96c2601f27e9c'
-}
-auth_client.deposit(depositParams)
-```
-```python
-# Withdraw from CB Pro into Coinbase Wallet
-withdrawParams = {
-        'amount': '1.00', # Currency determined by account specified
-        'coinbase_account_id': '536a541fa9393bb3c7000023'
-}
-auth_client.withdraw(withdrawParams)
+private.payments.list() -> list
 ```
 
-### WebsocketClient
+## `cbpro.private.Coinbase`
+
+```python
+cbpro.private.Coinbase(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Coinbase.list`
+
+- [List Accounts](https://docs.pro.coinbase.com/#list-accounts64)
+
+```python
+private.coinbase.list() -> list
+```
+
+## `cbpro.private.Fees`
+
+```python
+cbpro.private.Fees(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Fees.get`
+
+- [Get Current Fees](https://docs.pro.coinbase.com/#get-current-fees)
+
+```python
+private.fees.get() -> list
+```
+
+## `cbpro.private.Reports`
+
+```python
+# NOTE:
+#   - This object is currently undefined
+cbpro.private.Reports(messenger: cbpro.messenger.Messenger)
+```
+
+## `cbpro.private.Profiles`
+
+```python
+cbpro.private.Profiles(messenger: cbpro.messenger.Messenger)
+```
+
+### `cbpro.private.Profiles.list`
+
+- [List Profiles](https://docs.pro.coinbase.com/#list-profiles)
+
+```python
+private.profiles.list(params: dict = None) -> list
+```
+
+### `cbpro.private.Profiles.get`
+
+- [Get a Profile](https://docs.pro.coinbase.com/#get-a-profile)
+
+```python
+private.profiles.get(profile_id: str) -> dict
+```
+
+### `cbpro.private.Profiles.transfer`
+
+- [Create Profile Transfer](https://docs.pro.coinbase.com/#create-profile-transfer)
+
+```python
+private.profiles.transfer(json: dict) -> dict
+```
+
+## `cbpro.private.Oracle`
+
+```python
+# NOTE:
+#   - This object is currently undefined
+cbpro.private.Oracle(messenger: cbpro.messenger.Messenger)
+```
+
+# WebsocketClient
+
 If you would like to receive real-time market updates, you must subscribe to the
 [websocket feed](https://docs.pro.coinbase.com/#websocket-feed).
 
 #### Subscribe to a single product
+
 ```python
 import cbpro
 

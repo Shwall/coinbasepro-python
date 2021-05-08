@@ -70,21 +70,21 @@ class Deposits(cbpro.messenger.Subscriber):
 
 
 class Withdrawals(Deposits):
-    def payment(self, **json: dict) -> dict:
+    def payment(self, json: dict) -> dict:
         return self.messenger.post('/withdrawals/payment-method', json=json)
 
-    def coinbase(self, **json: dict) -> dict:
+    def coinbase(self, json: dict) -> dict:
         return self.messenger.post('/withdrawals/coinbase-account', json=json)
 
-    def crypto(self, **json: dict) -> dict:
+    def crypto(self, json: dict) -> dict:
         return self.messenger.post('/withdrawals/crypto', json=json)
 
-    def estimate(self, **params: dict) -> dict:
+    def estimate(self, params: dict) -> dict:
         return self.messenger.get('/withdrawals/fee-estimate', params=params)
 
 
 class Conversions(cbpro.messenger.Subscriber):
-    def create(self, **json: dict) -> dict:
+    def create(self, json: dict) -> dict:
         return self.messenger.post('/conversions', json=json)
 
 
@@ -108,13 +108,13 @@ class Reports(cbpro.messenger.Subscriber):
 
 
 class Profiles(cbpro.messenger.Subscriber):
-    def list(self, **params: dict) -> list:
+    def list(self, params: dict = None) -> list:
         return self.messenger.get('/profiles', params=params)
 
     def get(self, profile_id: str) -> dict:
         return self.messenger.get(f'/profiles/{profile_id}')
 
-    def transfer(self, **json: dict) -> dict:
+    def transfer(self, json: dict) -> dict:
         return self.messenger.post('/profiles/transfer', json=json)
 
 
