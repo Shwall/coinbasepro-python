@@ -17,18 +17,23 @@ class ProductsModel(object):
     def history(self,
                 start: str = None,
                 end: str = None,
-                granularity: int = 86400) -> dict:
-
-        params = dict()
+                granularity: int = None) -> dict:
 
         if start or end:
             cbpro.check.products_history_range(start, end)
-            params['start'] = start
-            params['end'] = end
+
+        if granularity is None:
+            granularity = 86400  # default to 1 day
 
         cbpro.check.products_history_granularity(granularity)
-        params['granularity'] = granularity
-        return params
+
+        params = {
+            'start': start,
+            'end': end,
+            'granularity': granularity
+        }
+
+        return cbpro.utils.filter_empty(params)
 
 
 class PublicModel(object):
@@ -150,7 +155,7 @@ class OrdersModel(object):
 
 
 class FillsModel(object):
-    def get(self, product_id: str = None, order_id: str = None) -> dict:
+    def list(self, product_id: str = None, order_id: str = None) -> dict:
         cbpro.check.fills_get_id(product_id, order_id)
 
         if product_id:
@@ -167,7 +172,96 @@ class DepositsModel(object):
              after: str = None,
              limit: int = None) -> dict:
 
-        return None
+        if type_:
+            cbpro.check.deposits_list_type(type_)
+
+        if limit:
+            cbpro.check.deposits_list_limit(limit)
+
+        params = {
+            'type': type_,
+            'profile_id': profile_id,
+            'before': before,
+            'after': after,
+            'limit': limit
+        }
+
+        return cbpro.utils.filter_empty(params)
+
+    def payment(self,
+                amount: float,
+                currency: str,
+                payment_id: str) -> dict:
+
+        return {
+            'amount': amount,
+            'currency': currency,
+            'payment_method_id': payment_id
+        }
+
+    def coinbase(self,
+                 amount: float,
+                 currency: str,
+                 coinbase_id: str) -> dict:
+
+        return {
+            'amount': amount,
+            'currency': currency,
+            'coinbase_account_id': coinbase_id
+        }
+
+
+class WithdrawalsModel(DepositsModel):
+    def __init__(self):
+        super(WithdrawalsModel, self).__init__()
+
+    def crypto(self,
+               amount: float,
+               currency: str,
+               address: str) -> dict:
+
+        return {
+            'amount': amount,
+            'currency': currency,
+            'crypto_address': address
+        }
+
+    def estimate(self, currency: str, address: str) -> dict:
+        return {
+            'currency': currency,
+            'crypto_address': address
+        }
+
+
+class ConversionsModel(object):
+    def create(self,
+               from_: str,
+               to: str,
+               amount: float) -> dict:
+
+        return {
+            'from': from_,
+            'to': to,
+            'amount': amount
+        }
+
+
+class ProfilesModel(object):
+    def list(self, active: bool) -> dict:
+        return {'active': active}
+
+    def transfer(self,
+                 from_: str,
+                 to: str,
+                 currency: str,
+                 amount: float) -> dict:
+
+        return {
+            'from': from_,
+            'to': to,
+            'currency': currency,
+            'amount': amount
+        }
 
 
 class PrivateModel(PublicModel):
@@ -177,3 +271,6 @@ class PrivateModel(PublicModel):
         self.orders = OrdersModel()
         self.fills = FillsModel()
         self.deposits = DepositsModel()
+        self.withdrawals = WithdrawalsModel()
+        self.conversions = ConversionsModel()
+        self.profiles = ProfilesModel()

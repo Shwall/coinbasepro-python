@@ -102,3 +102,15 @@ def orders_list_status(value: str):
 def fills_get_id(product_id: str, order_id: str):
     message = 'one of `product_id` or `order_id` is required'
     assert_xor(product_id, order_id, message)
+
+
+def deposits_list_type(value: str):
+    accepted = ['deposit', 'internal_depost']
+    message = '`type` must be one of: {accepted}'
+    assert_in(value, accepted, message)
+
+
+def deposits_list_limit(value: int):
+    condition = 0 < value <= 100
+    message = '`value` must be type int where 0 < `value` <= 100'
+    assert_true(condition, message)

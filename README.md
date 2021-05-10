@@ -951,6 +951,42 @@ private.profiles.transfer(json: dict) -> dict
 cbpro.private.Oracle(messenger: cbpro.messenger.Messenger)
 ```
 
+## `cbpro.models.PrivateModel`
+
+```python
+# NOTE:
+#   - `cbpro.models.PrivateModel` inherits from `cbpro.models.PublicModel`
+cbpro.models.PrivateModel()
+```
+
+Use `PrivateModel` to generate passable parameters easily.
+
+Example:
+
+```python
+import cbpro
+
+model = cbpro.PrivateModel()
+```
+
+## `cbpro.models.OrdersModel`
+
+```python
+cbpro.models.OrdersModel()
+```
+
+### `cbpro.models.OrdersModel.base`
+
+```python
+model.orders.base(side: str,
+                  product_id: str,    
+                  type_: str = None,  
+                  client_oid: str = None, 
+                  stp: str = None,    
+                  stop: str = None,   
+                  stop_price: float = None) -> dict   
+```
+
 # WebsocketClient
 
 If you would like to receive real-time market updates, you must subscribe to the
