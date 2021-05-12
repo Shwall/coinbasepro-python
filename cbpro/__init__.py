@@ -6,3 +6,7 @@ from cbpro.private import PrivateClient
 from cbpro.private import private_client
 from cbpro.models import PublicModel
 from cbpro.models import PrivateModel
+from cbpro.websocket import Header
+from cbpro.websocket import Stream
+from cbpro.websocket import Event
+from cbpro.websocket import Client

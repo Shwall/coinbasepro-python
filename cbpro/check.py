@@ -1,3 +1,8 @@
+import typing
+
+Iterable = typing.TypeVar('Iterable', list, dict)
+
+
 def assert_true(value: object, message: str):
     assert bool(value), message
 
@@ -10,18 +15,46 @@ def assert_and(object1: object, object2: object, message: str):
     assert object1 and object2, message
 
 
-def assert_in(value: object, accepted: list, message: str):
-    assert value and value in accepted, message
-
-
-def assert_is(object1: object, object2: object, message: str):
-    assert isinstance(object1, object2), message
+def assert_or(object1: object, object2: object, message: str):
+    assert object1 or object2, message
 
 
 def assert_xor(object1: object, object2: object, message: str):
     # * villagers screaming black magic from the distance *
     # https://stackoverflow.com/a/2451393/15147156
     assert (object1 is None) ^ (object2 is None), message
+
+
+def assert_is(object1: object, object2: object, message: str):
+    assert isinstance(object1, object2), message
+
+
+def assert_in(value: object, accepted: Iterable, message: str):
+    assert value and value in accepted, message
+
+
+def assert_message(label: str, type_: str) -> str:
+    return f'`{label}` must be of type {type_}'
+
+
+def assert_int(value: int, label: str):
+    assert_is(value, int, assert_message(label, 'int'))
+
+
+def assert_float(value: float, label: str):
+    assert_is(value, float, assert_message(label, 'float'))
+
+
+def assert_str(value: str, label: str):
+    assert_is(value, str, assert_message(label, 'str'))
+
+
+def assert_list(value: list, label: str):
+    assert_is(value, list, assert_message(label, 'str'))
+
+
+def assert_dict(value: dict, label: str):
+    assert_is(value, dict, assert_message(label, 'dict'))
 
 
 def products_order_book(level: int):
@@ -114,3 +147,37 @@ def deposits_list_limit(value: int):
     condition = 0 < value <= 100
     message = '`value` must be type int where 0 < `value` <= 100'
     assert_true(condition, message)
+
+
+# TODO:
+#   - Clean up websocket params tests
+#   - Seperate the functions from one another
+def websocket_params(value: dict):
+    def assert_params(value):
+        assert_dict(value, 'params')
+
+    def assert_params_type(value):
+        assert_in('type', value, 'subscription `type` must be defined')
+        assert_str(value['type'], 'type')
+
+    def assert_params_value(key):
+        key = 'product_ids'
+        message = f'`{key}` must be defined for subscription'
+        assert_in(key, value, message)
+
+        assert_list(value[key], key)
+
+        message = f'`{key}` must have a value of type list[str]'
+        assert_true(value[key], message)
+
+    assert_params(value)
+    assert_params_type(value)
+    assert_params_value('product_ids')
+    assert_params_value('channels')
+
+
+def websocket_disconnect(value: object):
+    import websocket
+
+    message = f'`Stream.connection` must be an instance of `websocket.WebSocket`'
+    assert_is(value, websocket.WebSocket, message)
