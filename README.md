@@ -116,9 +116,9 @@ print(json)
 - [Requests](https://docs.pro.coinbase.com/#requests)
 
 ```python
-class cbpro.messenger.Messenger(auth: cbpro.auth.Auth = None,
-                                url: str = None,
-                                timeout: int = None) 
+cbpro.messenger.Messenger(auth: cbpro.auth.Auth = None,
+                          url: str = None,
+                          timeout: int = None) 
 ```
 
 The `Messenger` object is a `requests` wrapper. It handles most of the common repeated tasks for you.
@@ -496,6 +496,8 @@ type(history)  # <class 'list'>
 len(history)   # 7
 print(history)
 ```
+
+# Private API
 
 ## `cbpro.private.PrivateClient`
 
@@ -978,101 +980,588 @@ cbpro.models.OrdersModel()
 ### `cbpro.models.OrdersModel.base`
 
 ```python
+# NOTE:
+#   - These params are common to all orders
+#   - You should prefer using the `market` and `limit` methods instead
+#   - the `side` argument must be of type `str`: 'buy' or 'sell'
+#   - the `product_id` argument must be of type `str`: i.e. 'BTC-USD'
+#   - the `type_` argument must be of type `str`: 'limit' or 'market'
 model.orders.base(side: str,
                   product_id: str,    
                   type_: str = None,  
                   client_oid: str = None, 
                   stp: str = None,    
                   stop: str = None,   
-                  stop_price: float = None) -> dict   
+                  stop_price: float = None) -> dict
 ```
 
-# WebsocketClient
+### `cbpro.models.OrdersModel.limit`
+
+```python
+# NOTE:
+#   - Limit orders are synonymous with Stop orders
+#   - If you want to place a Stop order, then you can
+#     use either the `limit` or `market` methods by 
+#     setting the `stop` and `stop_price` arguments 
+#     respectively.
+model.orders.limit(side: str,
+                   product_id: str,
+                   price: float,
+                   size: float,
+                   time_in_force: str = None,
+                   cancel_after: str = None,
+                   post_only: bool = None,
+                   client_oid: str = None,
+                   stp: str = None,
+                   stop: str = None,
+                   stop_price: float = None) -> dict
+```
+
+Example:
+
+```python
+request = model.orders.limit('buy', 'BTC-USD', 48662.26, 0.001)
+print(request)
+
+response = private.orders.post(request)
+print(response)
+```
+
+### `cbpro.models.OrdersModel.market`
+
+```python
+# NOTE:
+#   - This method requires either a `size` or `funds` argument
+model.orders.market(side: str,
+                    product_id: str,
+                    size: float = None,
+                    funds: float = None,
+                    client_oid: str = None,
+                    stp: str = None,
+                    stop: str = None,
+                    stop_price: float = None) -> dict
+```
+
+Example:
+
+```python
+request = model.orders.market('buy', 'BTC-USD', funds=100.0)
+print(request)
+
+response = private.orders.post(request)
+print(response)
+```
+
+### `cbpro.models.OrdersModel.cancel`
+
+```python
+model.orders.cancel(product_id: str = None) -> dict
+```
+
+Example:
+
+```python
+request = model.orders.cancel('LINK-USD')
+# request
+#   {'product_id': 'LINK-USD'}
+response = private.orders.cancel(
+    'eb183792-95df-4b02-987b-b7e91940bed9', request
+)
+# response
+#   'eb183792-95df-4b02-987b-b7e91940bed9'
+```
+
+### `cbpro.models.OrdersModel.list`
+
+```python
+# NOTE:
+#   - `status` must be one of: 
+#         'open', 'pending', 'active', 'done', or 'all'
+model.orders.list(status: str, product_id: str = None) -> dict
+```
+
+Example:
+
+```python
+request = model.orders.list('open')
+response = private.orders.list(request)
+for order in response:
+    print(order)
+```
+
+## `cbpro.models.FillsModel`
+
+```python
+cbpro.models.FillsModel()
+```
+
+### `cbpro.models.FillsModel.list`
+
+```python
+# NOTE:
+#   - You are required to provide either a `product_id` or `order_id`
+model.fills.list(product_id: str = None, order_id: str = None) -> dict
+```
+
+## `cbpro.models.DepositsModel`
+
+```python
+cbpro.models.DepositsModel()
+```
+
+### `cbpro.models.DepositsModel.list`
+
+```python
+# NOTE:
+#   - These parameters are all optional
+#   - If `type_` is set, then it must be of type str
+#     where `type` is 'deposit' or 'internal_deposit'
+#   - If `limit` is set, then it must be of type int
+#     where `limit` is 0 < limit <= 100
+model.deposits.list(type_: str = None,
+                    profile_id: str = None,
+                    before: str = None,
+                    after: str = None,
+                    limit: int = None) -> dict
+```
+
+### `cbpro.models.DepositsModel.payment`
+
+```python
+# NOTE:
+#   - `payment_id` represents the `payment_method_id` parameter
+model.deposits.payment(amount: float,
+                       currency: str,
+                       payment_id: str) -> dict
+```
+
+### `cbpro.models.DepositsModel.coinbase`
+
+```python
+# NOTE:
+#   - `coinbase_id` represents the `coinbase_account_id` parameter
+model.deposits.payment(amount: float,
+                       currency: str,
+                       coinbase_id: str) -> dict
+```
+
+## `cbpro.models.WithdrawalsModel`
+
+```python
+# NOTE:
+#   - `cbpro.models.WithdrawalsModel` inherits from 
+#     `cbpro.models.DepositsModel`
+cbpro.models.WithdrawalsModel()
+```
+
+### `cbpro.models.WithdrawalsModel.crypto`
+
+```python
+# NOTE:
+#   - `address` represents the `crypto_address` parameter
+model.withdrawals.crypto(amount: float,
+                         currency: str,
+                         address: str) -> dict
+```
+
+### `cbpro.models.WithdrawalsModel.estimate`
+
+```python
+# NOTE:
+#   - `address` represents the `crypto_address` parameter
+model.withdrawals.estimate(currency: str, address: str) -> dict
+```
+
+## `cbpro.models.ConversionsModel`
+
+```python
+cbpro.models.ConversionsModel()
+```
+
+### `cbpro.models.ConversionsModel.create`
+
+```python
+model.conversions.create(from_: str,
+                         to: str,
+                         amount: float) -> dict
+```
+
+## `cbpro.models.ProfilesModel`
+
+```python
+cbpro.models.ProfilesModel()
+```
+
+### `cbpro.models.ProfilesModel.list`
+
+```python
+model.profiles.list(active: bool) -> dict
+```
+
+### `cbpro.models.ProfilesModel.transfer`
+
+```python
+model.profiles.transfer(from_: str,
+                        to: str,
+                        currency: str,
+                        amount: float) -> dict
+```
+
+# Websocket Feed
+
+## `cbpro.websocket.get_message`
+
+```python
+cbpro.websocket.get_message(value: dict = none) -> dict
+```
 
 If you would like to receive real-time market updates, you must subscribe to the
-[websocket feed](https://docs.pro.coinbase.com/#websocket-feed).
+[Websocket Feed](https://docs.pro.coinbase.com/#websocket-feed).
 
-#### Subscribe to a single product
+Example:
 
 ```python
 import cbpro
 
-# Parameters are optional
-wsClient = cbpro.WebsocketClient(url="wss://ws-feed.pro.coinbase.com",
-                                products="BTC-USD",
-                                channels=["ticker"])
+message = cbpro.get_message()
+# message
+#     {
+#       'type': 'subscribe', 
+#       'product_ids': ['BTC-USD'], 
+#       'channels': ['ticker']
+#     }
+```
+
+## `cbpro.websocket.Header`
+
+```python
+# NOTE:
+#   - This class is callable
+#   - Authentication is optional
+#   - Authentication will result in a couple of benefits
+#       - Messages where you're one of the parties are expanded 
+#         and have more useful fields
+#       - You will receive private messages, such as lifecycle 
+#         information about stop orders you placed
+cbpro.websocket.Header(key: str,
+                       secret: str,
+                       passphrase: str)
+```
+
+You can also authenticate yourself with the [Websocket Feed](https://docs.pro.coinbase.com/#websocket-feed).
+
+Example:
+
+```python
+import cbpro
+
+key = 'My Key'
+secret = 'My Secret'
+passphrase = 'My Passphrase'
+
+header = cbpro.WebsocketHeader(key, secret, passphrase)
+
+auth = header()
+
+print(auth)
+```
+
+## `cbpro.websocket.WebsocketStream`
+
+```python
+cbpro.websocket.WebsocketStream(header: WebsocketHeader = None,
+                                timeout: int = None,
+                                traceable: bool = False)
+```
+
+Subscribe to a single product
+
+```python
+import cbpro
+
+message = cbpro.get_message({
+    'type': 'subscribe',
+    'product_ids': ['BTC-USD'], 
+    'channels': ['ticker']
+})
+
+stream = cbpro.WebsocketStream()
+stream.connect()
+stream.send(message)
 # Do other stuff...
-wsClient.close()
+stream.disconnect()
 ```
 
-#### Subscribe to multiple products
+Subscribe to multiple products
+
 ```python
 import cbpro
-# Parameters are optional
-wsClient = cbpro.WebsocketClient(url="wss://ws-feed.pro.coinbase.com",
-                                products=["BTC-USD", "ETH-USD"],
-                                channels=["ticker"])
+
+message = cbpro.get_message({
+    'type': 'subscribe',
+    'product_ids': ['BTC-USD', 'ETH-USD'], 
+    'channels': ['ticker']
+})
+
+stream = cbpro.WebsocketStream()
+stream.connect()
+stream.send(message)
 # Do other stuff...
-wsClient.close()
+stream.disconnect()
 ```
 
-### WebsocketClient + Mongodb
-The ```WebsocketClient``` now supports data gathering via MongoDB. Given a
-MongoDB collection, the ```WebsocketClient``` will stream results directly into
-the database collection.
+Example:
+
 ```python
-# import PyMongo and connect to a local, running Mongo instance
-from pymongo import MongoClient
 import cbpro
-mongo_client = MongoClient('mongodb://localhost:27017/')
 
-# specify the database and collection
-db = mongo_client.cryptocurrency_database
-BTC_collection = db.BTC_collection
+key = 'My Key'
+secret = 'My Secret'
+passphrase = 'My Passphrase'
 
-# instantiate a WebsocketClient instance, with a Mongo collection as a parameter
-wsClient = cbpro.WebsocketClient(url="wss://ws-feed.pro.coinbase.com", products="BTC-USD",
-    mongo_collection=BTC_collection, should_print=False)
-wsClient.start()
+message = cbpro.get_message()
+
+header = cbpro.WebsocketHeader(key, secret, passphrase)
+stream = cbpro.WebsocketStream(header=header, traceable=True)
+
+print(stream.connected)
+
+stream.connect()
+stream.send(message)
+
+print(stream.connected)
+
+response = stream.receive()
+print(response)
+
+response = stream.receive()
+print(response)
+
+stream.disconnect()
 ```
 
-### WebsocketClient Methods
+### `cbpro.websocket.WebsocketStream.connected`
+
+```python
+# NOTE:
+#   - This is a read-only property
+cbpro.websocket.connected -> bool
+```
+
+### `cbpro.websocket.WebsocketStream.connect`
+
+```python
+cbpro.websocket.connect() -> None
+```
+
+### `cbpro.websocket.WebsocketStream.send`
+
+```python
+cbpro.websocket.send(params: dict) -> None
+```
+
+### `cbpro.websocket.WebsocketStream.receive`
+
+```python
+cbpro.websocket.receive() -> dict
+```
+
+### `cbpro.websocket.WebsocketStream.ping`
+
+```python
+# NOTE:
+#   - This method blocks
+#   - This method sends a keepalive request
+#   - Ping the connection based on the timeout
+cbpro.websocket.ping() -> None
+```
+
+### `cbpro.websocket.WebsocketStream.disconnect`
+
+```python
+cbpro.websocket.disconnect() -> None
+```
+
+## `cbpro.websocket.WebsocketEvent`
+
+```python
+# NOTE:
+#   - This class and its behavior is subject to change
+#   - Other methods are being investigated
+#       - We can use threading.Event (optional)
+#       - We can use signal (optional)
+cbpro.websocket.WebsocketEvent()
+```
+
+The purpose of the `WebsocketEvent` class is mainly to serve as a template for user defined methods. The current object is for illustration purposes only.
+
+The `WebsocketEvent` object can be used to define executable methods while the `WebsocketClient` is manipulating a `threading.Thread`.
+
+You can inherit from this class and override any of the given methods to implement any desired behavior during a specific point in execution.
+
+The `WebsocketEvent.on_listen` method is most likely the one you'll care most for because that is executed during the `threading.Thread` lifespan.
+
+### `cbpro.websocket.WebsocketEvent.on_error`
+
+```python
+cbpro.websocket.on_error(*args, **kwargs) -> object
+```
+
+- called once *immediately after* the exception is raised
+
+### `cbpro.websocket.WebsocketEvent.on_start`
+
+```python
+cbpro.websocket.on_start(*args, **kwargs) -> object
+```
+
+- called once *immediately before* the socket connection is made, this
+is where you want to add initial parameters.
+
+### `cbpro.websocket.WebsocketEvent.on_run`
+
+```python
+cbpro.websocket.on_run(*args, **kwargs) -> object
+```
+
+- called once *immediately before* the thread is made, this
+is where you want to add initial parameters.
+
+### `cbpro.websocket.WebsocketEvent.on_stop`
+
+```python
+cbpro.websocket.on_stop(*args, **kwargs) -> object
+```
+
+- called once *immediately before* the websocket is closed.
+
+### `cbpro.websocket.WebsocketEvent.on_listen`
+
+```python
+cbpro.websocket.on_listen(*args, **kwargs) -> object
+```
+
+- called once for every message received *if* the message resolves to `True`
+
+## `cbpro.websocket.WebsocketClient`
+
+```python
+# NOTE:
+#   - This class and its behavior is subject to change
+#   - Other methods are being investigated
+#       - We can use threading.Event (optional)
+#       - We can use signal (optional)
+cbpro.websocket.WebsocketClient(stream: WebsocketStream,
+                                event: WebsocketEvent = None,
+                                collection: pymongo.collection.Collection = None)
+```
+
 The ```WebsocketClient``` subscribes in a separate thread upon initialization.
-There are three methods which you could overwrite (before initialization) so it
+There are three methods which you could overwrite *before initialization* so it
 can react to the data streaming in.  The current client is a template used for
 illustration purposes only.
 
-- onOpen - called once, *immediately before* the socket connection is made, this
-is where you want to add initial parameters.
-- onMessage - called once for every message that arrives and accepts one
-argument that contains the message of dict type.
-- on_close - called once after the websocket has been closed.
-- close - call this method to close the websocket connection (do not overwrite).
-```python
-import cbpro, time
-class myWebsocketClient(cbpro.WebsocketClient):
-    def on_open(self):
-        self.url = "wss://ws-feed.pro.coinbase.com/"
-        self.products = ["LTC-USD"]
-        self.message_count = 0
-        print("Lets count the messages!")
-    def on_message(self, msg):
-        self.message_count += 1
-        if 'price' in msg and 'type' in msg:
-            print ("Message type:", msg["type"],
-                   "\t@ {:.3f}".format(float(msg["price"])))
-    def on_close(self):
-        print("-- Goodbye! --")
+### `WebsocketClient` + `CustomEvent`
 
-wsClient = myWebsocketClient()
-wsClient.start()
-print(wsClient.url, wsClient.products)
-while (wsClient.message_count < 500):
-    print ("\nmessage_count =", "{} \n".format(wsClient.message_count))
-    time.sleep(1)
-wsClient.close()
+```python
+import time
+import cbpro
+
+
+class CustomEvent(cbpro.WebsocketEvent):
+    def __init__(self):
+        # initialize the inherited methods
+        super(CustomEvent, self).__init__()
+    
+    # this method is overridden even though it reimplements the
+    # default behavior
+    def on_run(self):
+        print(f'[Run] {threading.active_count()} active threads')
+        time.sleep(1)
+
+
+message = cbpro.get_message()
+stream = cbpro.WebsocketStream()
+event = CustomEvent()
+client = cbpro.WebsocketClient(stream, event=event)
+client.run(message)
+time.sleep(15)
+client.stop()
 ```
-## Testing
+
+### `WebsocketClient` + `pymongo`
+
+The `WebsocketClient` supports data gathering via `pymongo`. Given a `pymongo.collection.Collection`, the `WebsocketClient` will stream results directly into the database collection.
+
+```python
+import time
+import pymongo
+import cbpro
+
+# connect to a local, running, Mongo instance
+mongo = pymongo.MongoClient('mongodb://localhost:27017/')
+
+# specify the database and collection
+database = mongo.cryptocurrency_database
+bitcoin_collection = database.bitcoin_collection
+
+# instantiate a WebsocketClient instance with Mongo collection as parameter
+message = cbpro.get_message()
+stream = cbpro.WebsocketStream()
+client = cbpro.WebsocketClient(stream, collection=bitcoin_collection)
+client.run(message)
+time.sleep(15)
+client.stop()
+```
+
+### `cbpro.websocket.WebsocketClient.listen`
+
+```python
+client.listen(*args, **kwargs) -> object
+```
+
+- listen to received stream messages 
+- this is called once at the end of `client.start` *after* the stream is connected
+
+### `cbpro.websocket.WebsocketClient.start`
+
+```python
+client.start(*args, **kwargs) -> object
+```
+
+- starts the `stream` and calls `listen`
+- this is where you want to add initial parameters
+
+### `cbpro.websocket.WebsocketClient.run`
+
+```python
+client.run(*args, **kwargs) -> object
+```
+
+- create and start the `thread`
+- this is where you want to add initial parameters
+
+### `cbpro.websocket.WebsocketClient.stop`
+
+```python
+client.stop(*args, **kwargs) -> object
+```
+
+- disconnect from the `stream` and join the `thread`
+
+## `cbpro.websocket.websocket_client`
+
+```python
+cbpro.websocket.websocket_client(key: str = None,
+                                 secret: str = None,
+                                 passphrase: str = None,
+                                 event: WebsocketEvent = None,
+                                 collection: pymongo.collection.Collection = None,
+                                 traceable: bool = False) -> WebsocketClient
+```
+
+# Testing
+
 A test suite is under development. Tests for the authenticated client require a 
 set of sandbox API credentials. To provide them, rename 
 `api_config.json.example` in the tests folder to `api_config.json` and edit the 
@@ -1104,7 +1593,8 @@ directory run:
 python -m pytest
 ```
 
-## Change Log
+# Change Log
+
 *1.1.2* **Current PyPI release**
 - Refactor project for Coinbase Pro
 - Major overhaul on how pagination is handled

@@ -26,7 +26,7 @@ def get_message(value: dict = None) -> dict:
     return value
 
 
-class Header(object):
+class WebsocketHeader(object):
     def __init__(self,
                  key: str,
                  secret: str,
@@ -47,9 +47,9 @@ class Header(object):
         }
 
 
-class Stream(object):
+class WebsocketStream(object):
     def __init__(self,
-                 header: Header = None,
+                 header: WebsocketHeader = None,
                  timeout: int = None,
                  traceable: bool = False) -> None:
 
@@ -61,7 +61,9 @@ class Stream(object):
 
     @property
     def connected(self):
-        return self.connection and self.connection.connected
+        if self.connection and self.connection.connected:
+            return True
+        return False
 
     def connect(self) -> None:
         header = None if self.header is None else self.header()
@@ -94,7 +96,7 @@ class Stream(object):
             self.connection.close()
 
 
-class Event(object):
+class WebsocketEvent(object):
     def on_error(self, value: str) -> None:
         print(f'[Exception] {value}\n')
 
@@ -122,10 +124,10 @@ class Event(object):
             collection.insert_one(value)
 
 
-class Client(object):
+class WebsocketClient(object):
     def __init__(self,
-                 stream: Stream,
-                 event: Event = None,
+                 stream: WebsocketStream,
+                 event: WebsocketEvent = None,
                  collection: pymongo.collection.Collection = None) -> None:
 
         self.stream = stream
@@ -133,7 +135,7 @@ class Client(object):
         self.running = False
         self.thread = None
         self.keepalive = None
-        self.event = Event() if event is None else event
+        self.event = WebsocketEvent() if event is None else event
 
     def listen(self) -> None:
         while self.running:
@@ -158,3 +160,20 @@ class Client(object):
         self.running = False
         self.stream.disconnect()
         self.thread.join()
+
+
+def websocket_client(key: str = None,
+                     secret: str = None,
+                     passphrase: str = None,
+                     event: WebsocketEvent = None,
+                     collection: pymongo.collection.Collection = None,
+                     traceable: bool = False) -> WebsocketClient:
+
+    header = None
+
+    if key and secret and passphrase:
+        header = WebsocketHeader(key, secret, passphrase)
+
+    stream = cbpro.Stream(header=header, traceable=traceable)
+
+    return WebsocketClient(stream, event, collection)

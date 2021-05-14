@@ -153,10 +153,10 @@ def deposits_list_limit(value: int):
 #   - Clean up websocket params tests
 #   - Seperate the functions from one another
 def websocket_params(value: dict):
-    def assert_params(value):
+    def assert_params():
         assert_dict(value, 'params')
 
-    def assert_params_type(value):
+    def assert_params_type():
         assert_in('type', value, 'subscription `type` must be defined')
         assert_str(value['type'], 'type')
 
@@ -170,8 +170,8 @@ def websocket_params(value: dict):
         message = f'`{key}` must have a value of type list[str]'
         assert_true(value[key], message)
 
-    assert_params(value)
-    assert_params_type(value)
+    assert_params()
+    assert_params_type()
     assert_params_value('product_ids')
     assert_params_value('channels')
 

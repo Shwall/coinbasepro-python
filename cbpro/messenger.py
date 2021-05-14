@@ -94,6 +94,9 @@ class Messenger(object):
 
             results = response.json()
 
+            if response.status_code != 200:
+                return results
+
             for result in results:
                 yield result
 
