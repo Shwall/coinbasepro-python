@@ -7,7 +7,6 @@
 A Python 3 Client Wrapper for the [Coinbase Pro Rest API](https://docs.pro.coinbase.com/)
 
 - Requires Python 3.6 or greater
-
 - Provided under MIT License by Daniel Paquin.
 
 ### Benefits
@@ -29,18 +28,34 @@ what and who is behind every tick.
 
 ### Aside
 
-- *NOTE: This library may be subtly broken or buggy.*
-
-- *NOTE: This library is a fork of the original. This library will resemble the original less over time as development continues. The API is not compatible with the original and will break your client interface. If you are here looking for the original GDAX project, you can [find it here](https://github.com/danpaquin/coinbasepro-python.git). I have left the the original `LICENSE` and `contributors.txt` files to credit the original author as well as the projects contributors.*
+- *This library is a fork of the original.*
+- *This library may be subtly broken or buggy.*
+- *If you are here looking for the original GDAX project, then you can [find it here](https://github.com/danpaquin/coinbasepro-python.git).*
 
 ### License
 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# Contents
+
+1) [Getting Started](#getting-started)
+2) [Install](#install)
+3) [Core API](#core-api)
+    - [cbpro.Auth](#cbproauthauth)
+    - [cbpro.Messenger](#cbpromessengermessenger)
+4) [Public API](#public-api)
+    - [cbpro.PublicClient](#cbpropublicpublicclient)
+    - [cbpro.PublicModel](#cbpromodelspublicmodel)
+5) [Private API](#private-api)
+    - [cbpro.PrivateClient](#cbproprivateprivateclient)
+    - [cbpro.PrivateModel](#cbpromodelsprivatemodel)
+6) [Websocket Feed](#websocket-feed)
+    - [cbpro.get_message](#cbprowebsocketget_message)
+    - [cbpro.WebsocketHeader](#cbprowebsocketheader)
+    - [cbpro.WebsocketStream](#cbprowebsocketwebsocketstream)
+7) [Real-Time Order Book](#contents)
+8) [Testing](#testing)
+9) [Change Log](#change-log)
 
 # Getting Started
 
@@ -52,7 +67,7 @@ See both Requests and Coinbase Pro API Documentation for full details.
 - [Requests API Docs](https://docs.python-requests.org/en/master/api/)
 - [Coinbase Pro API Docs](https://docs.pro.coinbase.com)
 
-*__WARNING__: It's recommended that you use the websocket interface instead of polling the general interface methods. It's best to reference the Coinbase Pro API Docs to see where polling is allowed, or even encouraged, in some niche cases. Polling can result in blocking, or even banning, access to the API in most other cases.*
+*__WARNING__: It's recommended that you use the `websocket` interface instead of polling the general interface methods. It's best to reference the Coinbase Pro API Docs to see where polling is allowed in some niche cases. Polling can result in blocking, or even banning, access to the API in most other cases.*
 
 # Install
 
