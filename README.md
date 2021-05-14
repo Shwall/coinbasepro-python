@@ -1345,25 +1345,25 @@ stream.disconnect()
 ```python
 # NOTE:
 #   - This is a read-only property
-cbpro.websocket.connected -> bool
+stream.connected -> bool
 ```
 
 ### `cbpro.websocket.WebsocketStream.connect`
 
 ```python
-cbpro.websocket.connect() -> None
+stream.connect() -> None
 ```
 
 ### `cbpro.websocket.WebsocketStream.send`
 
 ```python
-cbpro.websocket.send(params: dict) -> None
+stream.send(params: dict) -> None
 ```
 
 ### `cbpro.websocket.WebsocketStream.receive`
 
 ```python
-cbpro.websocket.receive() -> dict
+stream.receive() -> dict
 ```
 
 ### `cbpro.websocket.WebsocketStream.ping`
@@ -1373,13 +1373,13 @@ cbpro.websocket.receive() -> dict
 #   - This method blocks
 #   - This method sends a keepalive request
 #   - Ping the connection based on the timeout
-cbpro.websocket.ping() -> None
+stream.ping() -> None
 ```
 
 ### `cbpro.websocket.WebsocketStream.disconnect`
 
 ```python
-cbpro.websocket.disconnect() -> None
+stream.disconnect() -> None
 ```
 
 ## `cbpro.websocket.WebsocketEvent`
@@ -1401,10 +1401,16 @@ You can inherit from this class and override any of the given methods to impleme
 
 The `WebsocketEvent.on_listen` method is most likely the one you'll care most for because that is executed during the `threading.Thread` lifespan.
 
+```python
+import cbpro
+
+event = cbpro.WebsocketEvent()
+```
+
 ### `cbpro.websocket.WebsocketEvent.on_error`
 
 ```python
-cbpro.websocket.on_error(*args, **kwargs) -> object
+event.on_error(*args, **kwargs) -> object
 ```
 
 - called once *immediately after* the exception is raised
@@ -1412,7 +1418,7 @@ cbpro.websocket.on_error(*args, **kwargs) -> object
 ### `cbpro.websocket.WebsocketEvent.on_start`
 
 ```python
-cbpro.websocket.on_start(*args, **kwargs) -> object
+event.on_start(*args, **kwargs) -> object
 ```
 
 - called once *immediately before* the socket connection is made, this
@@ -1421,7 +1427,7 @@ is where you want to add initial parameters.
 ### `cbpro.websocket.WebsocketEvent.on_run`
 
 ```python
-cbpro.websocket.on_run(*args, **kwargs) -> object
+event.on_run(*args, **kwargs) -> object
 ```
 
 - called once *immediately before* the thread is made, this
@@ -1430,7 +1436,7 @@ is where you want to add initial parameters.
 ### `cbpro.websocket.WebsocketEvent.on_stop`
 
 ```python
-cbpro.websocket.on_stop(*args, **kwargs) -> object
+event.on_stop(*args, **kwargs) -> object
 ```
 
 - called once *immediately before* the websocket is closed.
@@ -1438,7 +1444,7 @@ cbpro.websocket.on_stop(*args, **kwargs) -> object
 ### `cbpro.websocket.WebsocketEvent.on_listen`
 
 ```python
-cbpro.websocket.on_listen(*args, **kwargs) -> object
+event.on_listen(*args, **kwargs) -> object
 ```
 
 - called once for every message received *if* the message resolves to `True`
