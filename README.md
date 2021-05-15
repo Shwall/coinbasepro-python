@@ -2,7 +2,7 @@
 
 ## About
 
-[![Build Status](https://travis-ci.org/danpaquin/coinbasepro-python.svg?branch=master)](https://travis-ci.org/danpaquin/coinbasepro-python)
+[![Build Status](https://travis-ci.org/teleprint-me/coinbasepro-python.svg?branch=master)](https://travis-ci.org/teleprint-me/coinbasepro-python)
 
 A Python 3 Client Wrapper for the [Coinbase Pro Rest API](https://docs.pro.coinbase.com/)
 

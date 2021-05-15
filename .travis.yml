@@ -2,7 +2,9 @@ sudo: false
 language: python
 # cache package wheels (1 cache per python version)
 cache: pip
-python: 3.5
+
+python: 
+  - 3.6
 
 install:
   - pip install .[test]
