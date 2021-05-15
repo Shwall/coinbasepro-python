@@ -1,10 +1,13 @@
-sudo: false
+os: linux
+dist: bionic
 language: python
 # cache package wheels (1 cache per python version)
 cache: pip
-
 python: 
   - 3.6
+  - 3.7
+  - 3.8
+  - 3.9
 
 install:
   - pip install .[test]
