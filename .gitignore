@@ -2,6 +2,7 @@
 # Local #
 #########
 main.py
+tests/auth.json
 
 ##########
 # Python #

@@ -1,0 +1,5 @@
+{
+    "key": "my key goes here",
+    "secret": "my secret goes here",
+    "passphrase": "my passphrase goes here"
+}
