@@ -21,9 +21,9 @@ what and who is behind every tick.
 
 ### Under Development
 
-- Test Scripts
-- Real-Time Order Book
+- Private Client and Websocket Tests
 - Web Socket Client
+- Real-Time Order Book
 - FIX API Client **[Looking for assistance](https://github.com/danpaquin/coinbasepro-python)**
 
 ### Aside
@@ -77,11 +77,19 @@ See both Requests and Coinbase Pro API Documentation for full details.
 
 ```sh
 git clone https://github.com/teleprint-me/coinbasepro-python.git
+cd coinbasepro-python
+virtualenv venv
+source venv/bin/activate
+python setup.py install
 ```
 
 - Install with `pip`
 
 ```sh
+mkdir my_client_project
+cd my_client_project
+virtualenv venv
+source venv/bin/activate
 pip install git+git://github.com/teleprint-me/coinbasepro-python.git
 ```
 
@@ -872,12 +880,12 @@ private.withdrawals.estimate(params: dict) -> dict
 cbpro.private.Conversions(messenger: cbpro.messenger.Messenger)
 ```
 
-### `cbpro.private.Conversions.create`
+### `cbpro.private.Conversions.post`
 
 - [Create Conversion](https://docs.pro.coinbase.com/#create-conversion)
 
 ```python
-private.conversions.create(json: dict) -> dict
+private.conversions.post(json: dict) -> dict
 ```
 
 ## `cbpro.private.Payments`
@@ -914,12 +922,12 @@ private.coinbase.list() -> list
 cbpro.private.Fees(messenger: cbpro.messenger.Messenger)
 ```
 
-### `cbpro.private.Fees.get`
+### `cbpro.private.Fees.list`
 
 - [Get Current Fees](https://docs.pro.coinbase.com/#get-current-fees)
 
 ```python
-private.fees.get() -> list
+private.fees.list() -> list
 ```
 
 ## `cbpro.private.Reports`
@@ -1193,10 +1201,10 @@ model.withdrawals.estimate(currency: str, address: str) -> dict
 cbpro.models.ConversionsModel()
 ```
 
-### `cbpro.models.ConversionsModel.create`
+### `cbpro.models.ConversionsModel.post`
 
 ```python
-model.conversions.create(from_: str,
+model.conversions.post(from_: str,
                          to: str,
                          amount: float) -> dict
 ```

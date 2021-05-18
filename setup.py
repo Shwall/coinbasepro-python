@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-version = '2.0.20'
+version = '2.1.28'
 
 url = 'https://github.com/teleprint-me/coinbasepro-python'
+tag = f'/archive/refs/tags/{version}.zip'
+download_url = url + tag
 
 install_requires = [
     'requests',
@@ -23,9 +25,6 @@ keywords = [
     'exchange', 'crypto', 'currency', 'trading', 'trading-api',
     'coinbase', 'pro', 'prime', 'coinbasepro'
 ]
-
-download_url = \
-    'https://github.com/teleprint-me/coinbasepro-python/archive/refs/tags/2.0.20.zip'
 
 with open("README.md", "r") as file:
     long_description = file.read()

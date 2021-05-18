@@ -174,6 +174,6 @@ def websocket_client(key: str = None,
     if key and secret and passphrase:
         header = WebsocketHeader(key, secret, passphrase)
 
-    stream = cbpro.Stream(header=header, traceable=traceable)
+    stream = WebsocketStream(header=header, traceable=traceable)
 
     return WebsocketClient(stream, event, collection)
