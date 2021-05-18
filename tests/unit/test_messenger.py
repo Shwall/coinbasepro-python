@@ -10,6 +10,11 @@ class TestMessenger(object):
         assert hasattr(messenger, 'url')
         assert hasattr(messenger, 'timeout')
         assert hasattr(messenger, 'session')
+        assert hasattr(messenger, 'route')
+        assert hasattr(messenger, 'get')
+        assert hasattr(messenger, 'post')
+        assert hasattr(messenger, 'delete')
+        assert hasattr(messenger, 'paginate')
 
     def test_messenger_instance(self, messenger):
         assert isinstance(messenger.url, str)
@@ -24,12 +29,16 @@ class TestMessenger(object):
     def test_messenger_post(self, auth_messenger, private_model):
         order = private_model.orders.market('buy', 'BTC-USD', funds=10.0)
         response = auth_messenger.post('/orders', json=order)
+
         for key, value in response.items():
             print(f'{key}: {value}')
+
         assert isinstance(response, dict)
+
         assert 'message' not in response
         assert 'side' in response
         assert 'product_id' in response
+
         assert response['side'] == 'buy'
         assert response['product_id'] == 'BTC-USD'
 

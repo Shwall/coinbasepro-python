@@ -42,10 +42,10 @@ class Currencies(cbpro.messenger.Subscriber):
         # NOTE: Not all currencies may be currently in use for trading
         return self.messenger.get('/currencies')
 
-    def get(self, product_id: str) -> dict:
+    def get(self, currency_id: str) -> dict:
         # NOTE: Currencies which have or had no representation in ISO 4217
         # may use a custom code
-        return self.messenger.get(f'/currencies/{product_id}')
+        return self.messenger.get(f'/currencies/{currency_id}')
 
 
 class Time(cbpro.messenger.Subscriber):
