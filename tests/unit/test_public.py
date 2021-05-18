@@ -1,10 +1,10 @@
 from itertools import islice
 from dateutil.relativedelta import relativedelta
+from tests.unit.utils import Teardown
 
 import datetime
 import pytest
 import inspect
-import time
 
 import cbpro.messenger
 import cbpro.public
@@ -36,16 +36,10 @@ class TestPublicClient(object):
         assert hasattr(currencies, 'get')
 
     def test_public_time(self, public_client):
-        cbtime = public_client.time
-        assert isinstance(cbtime, cbpro.messenger.Subscriber)
-        assert isinstance(cbtime, cbpro.public.Time)
-        assert hasattr(cbtime, 'get')
-
-
-class Teardown(object):
-    @staticmethod
-    def teardown_method():
-        time.sleep(.25)  # Avoid rate limit
+        time = public_client.time
+        assert isinstance(time, cbpro.messenger.Subscriber)
+        assert isinstance(time, cbpro.public.Time)
+        assert hasattr(time, 'get')
 
 
 class TestPublicProducts(Teardown):

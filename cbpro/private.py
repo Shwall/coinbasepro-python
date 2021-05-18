@@ -84,7 +84,7 @@ class Withdrawals(Deposits):
 
 
 class Conversions(cbpro.messenger.Subscriber):
-    def create(self, json: dict) -> dict:
+    def post(self, json: dict) -> dict:
         return self.messenger.post('/conversions', json=json)
 
 
@@ -99,7 +99,7 @@ class Coinbase(cbpro.messenger.Subscriber):
 
 
 class Fees(cbpro.messenger.Subscriber):
-    def get(self) -> list:
+    def list(self) -> list:
         return self.messenger.get('/fees')
 
 

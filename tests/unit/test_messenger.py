@@ -1,10 +1,12 @@
+from tests.unit.utils import Teardown
+
 import pytest
 import requests
 import inspect
 import cbpro.messenger
 
 
-class TestMessenger(object):
+class TestMessenger(Teardown):
     def test_messenger_attr(self, messenger):
         assert hasattr(messenger, 'auth')
         assert hasattr(messenger, 'url')

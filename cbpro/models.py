@@ -234,10 +234,10 @@ class WithdrawalsModel(DepositsModel):
 
 
 class ConversionsModel(object):
-    def create(self,
-               from_: str,
-               to: str,
-               amount: float) -> dict:
+    def post(self,
+             from_: str,
+             to: str,
+             amount: float) -> dict:
 
         return {
             'from': from_,

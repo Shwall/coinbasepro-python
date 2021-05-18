@@ -1,9 +1,11 @@
 import pytest
 import json
+
 import cbpro.auth
 import cbpro.messenger
 import cbpro.models
 import cbpro.public
+import cbpro.private
 
 
 @pytest.fixture(scope='module')
@@ -47,3 +49,15 @@ def private_model():
 @pytest.fixture(scope='module')
 def public_client(messenger):
     return cbpro.public.PublicClient(messenger)
+
+
+@pytest.fixture(scope='module')
+def private_client(auth_messenger):
+    return cbpro.private.PrivateClient(auth_messenger)
+
+
+@pytest.fixture(scope='module')
+def account_id(private_client):
+    accounts = private_client.accounts.list()
+    account_usd = [a for a in accounts if a['currency'] == 'USD']
+    return account_usd[0]['id']
