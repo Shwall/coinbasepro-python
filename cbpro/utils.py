@@ -12,13 +12,13 @@ def get_time_intervals(params: dict):
     start = datetime.datetime.fromisoformat(params.get("start"))
     end = datetime.datetime.fromisoformat(params.get("end"))
 
-    if window_size_ok(start, end, interval_length):
+    if time_interval_ok(start, end, interval_length):
         return [(start, end)]
 
     return get_intervals(start, end, interval_length)
 
 
-def get_intervals(start, end, interval_length):
+def get_intervals(start: datetime.datetime, end: datetime.datetime, interval_length: int):
     """Get all time intervals between start and end for the given interval_length.
 
     The function starts with the end of the time interval and goes back in interval_length steps to create all
@@ -27,9 +27,9 @@ def get_intervals(start, end, interval_length):
     start_init = start
     intervals = []
     start = end - datetime.timedelta(seconds=interval_length)
-    while start > start_init:
+    while start >= start_init:
         start = end - datetime.timedelta(seconds=interval_length)
-        if start < start_init:
+        if start <= start_init:
             intervals.append((start_init, end))
             break
         intervals.append((start, end))
@@ -37,6 +37,6 @@ def get_intervals(start, end, interval_length):
     return intervals
 
 
-def window_size_ok(start, end, interval_length):
+def time_interval_ok(start: datetime.datetime, end: datetime.datetime, interval_length: int):
     """Check if the [start, end] time interval is within the allowed interval_length."""
-    return end - datetime.timedelta(seconds=interval_length) <= start
+    return (end-start).total_seconds() <= interval_length
