@@ -1,5 +1,8 @@
 import cbpro.messenger
 
+from cbpro.utils import get_time_intervals
+from time import sleep
+
 
 class Products(cbpro.messenger.Subscriber):
     def list(self) -> list:
@@ -37,6 +40,30 @@ class Products(cbpro.messenger.Subscriber):
         return self.messenger.get(f'/products/{product_id}/stats')
 
 
+class History(cbpro.messenger.Subscriber):
+    def candles(self, product_id: str, params: dict = None):
+        """Get all candles for a given time frame from params.start to params.end.
+
+        If the requested time range is too large, the request is separated into multiple time intervals.
+        """
+        endpoint = f"/products/{product_id}/candles"
+
+        all_candles = []
+        for start, end in get_time_intervals(params):
+            params["start"] = start
+            params["end"] = end
+            candles = self.messenger.get(endpoint, params=params)
+            all_candles += candles
+
+            # sleep 0.26 seconds to prevent a timeout because a rate limit of 4 requests/second
+            sleep(0.26)
+
+        # sort by time ascending
+        all_candles.sort(key=lambda candle: candle[0])
+
+        return all_candles
+
+
 class Currencies(cbpro.messenger.Subscriber):
     def list(self) -> list:
         # NOTE: Not all currencies may be currently in use for trading
@@ -60,6 +87,7 @@ class PublicClient(object):
         self.products = Products(messenger)
         self.currencies = Currencies(messenger)
         self.time = Time(messenger)
+        self.history = History(messenger)
 
 
 def public_client(url=None):
