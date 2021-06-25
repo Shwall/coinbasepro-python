@@ -166,4 +166,5 @@ class TestPublicHistory(Teardown):
         assert isinstance(response, list)
         assert isinstance(response[0], list)
         assert len(response) == n_days
+        assert len(response[0]) == 6
 
