@@ -156,7 +156,7 @@ class TestPublicHistory(Teardown):
         product_id = 'BTC-USD'
         granularity = 86400  # daily
         end = datetime.datetime.now()
-        start = end - datetime.timedelta(seconds=granularity*n_days)
+        start = end - datetime.timedelta(days=n_days)
         params = {"start": start.isoformat(), "end": end.isoformat(), "granularity": granularity}
 
         # act

@@ -390,6 +390,48 @@ len(history)   # 7
 print(history)
 ```
 
+
+### `cbpro.public.History.candles`
+
+This interface allows querying of more than 300 candles by
+sending multiple requests if the requested time range 
+is too large.
+
+The [Coinbase Pro API - Get Historic Rates](https://docs.pro.coinbase.com/#get-historic-rates) 
+section describes it as follows:
+> The maximum number of data points for a single request is 300 candles. If your selection of start/end time and granularity will result in more than 300 data points, your request will be rejected. If you wish to retrieve fine granularity data over a larger time range, you will need to make multiple requests with new start/end ranges. 
+
+```python
+# NOTE:
+#   - Polling is discouraged for this method
+#   - Use the websocket stream for polling instead
+public.history.candles(product_id: str, params: dict) -> list
+```
+
+Example:
+
+```python
+import datetime
+import cbpro
+
+n_days = 301
+granularity = 86400  # daily
+end = datetime.datetime.now()
+start = end - datetime.timedelta(days=n_days)
+
+params = {'start': start.isoformat(), 'end': end.isoformat(), 'granularity': granularity}
+
+messenger = cbpro.Messenger()
+public = cbpro.PublicClient(messenger)
+
+product_id = "BTC-USD"
+history = public.history.candles(product_id, params)
+
+type(history)  # <class 'list'>
+len(history)   # 301
+print(history)
+```
+
 ### `cbpro.public.Products.stats`
 
 - [Get 24hr Stats](https://docs.pro.coinbase.com/#get-24hr-stats)

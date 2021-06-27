@@ -49,10 +49,11 @@ class History(cbpro.messenger.Subscriber):
         endpoint = f"/products/{product_id}/candles"
 
         all_candles = []
+        loop_params = params.copy()
         for start, end in get_time_intervals(params):
-            params["start"] = start
-            params["end"] = end
-            candles = self.messenger.get(endpoint, params=params)
+            loop_params["start"] = start
+            loop_params["end"] = end
+            candles = self.messenger.get(endpoint, params=loop_params)
             all_candles += candles
 
             # sleep 0.26 seconds to prevent a timeout because a rate limit of 4 requests/second

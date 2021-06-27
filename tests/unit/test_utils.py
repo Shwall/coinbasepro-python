@@ -3,7 +3,7 @@ from math import ceil
 
 import pytest
 
-from cbpro.utils import get_time_intervals, get_intervals, time_interval_ok
+from cbpro.utils import get_time_intervals, get_intervals, time_interval_ok, dt_string_to_datetime
 
 
 def test_window_size_ok():
@@ -63,3 +63,18 @@ def test_get_time_intervals():
         (datetime.datetime(2020, 3, 7, 0, 0), datetime.datetime(2021, 1, 1, 0, 0)),
         (datetime.datetime(2020, 1, 1, 0, 0), datetime.datetime(2020, 3, 7, 0, 0)),
     ]
+
+
+def test_dt_string_to_datetime():
+    """Test that the iso-formatted string is transformed to datetime correctly."""
+    # arrange
+    date1 = datetime.datetime(2020, 1, 1, 0, 0, 0)
+    date2 = datetime.datetime(2020, 1, 1, 0, 0, 0, 123)
+    date3 = datetime.datetime(2020, 1, 1, 0, 0, 0, 0)
+    date4 = datetime.datetime(2020, 1, 1, 0, 0, 0, 9)
+
+    # act / assert
+    assert dt_string_to_datetime(date1.isoformat()) == date1
+    assert dt_string_to_datetime(date2.isoformat()) == date2
+    assert dt_string_to_datetime(date3.isoformat()) == date3
+    assert dt_string_to_datetime(date4.isoformat()) == date4
