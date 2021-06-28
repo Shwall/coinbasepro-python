@@ -4,3 +4,4 @@ pymongo
 sortedcontainers
 python-dateutil
 pytest
+iso8601

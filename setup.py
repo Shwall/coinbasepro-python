@@ -12,6 +12,7 @@ install_requires = [
     'websocket-client',
     'pymongo',
     'sortedcontainers'
+    'iso8601'
 ]
 
 tests_require = [
