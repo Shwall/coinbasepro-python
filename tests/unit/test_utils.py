@@ -3,7 +3,7 @@ from math import ceil
 
 import pytest
 
-from cbpro.utils import get_time_intervals, get_intervals, time_interval_ok, dt_string_to_datetime
+from cbpro.utils import get_time_intervals, get_intervals, time_interval_ok
 
 
 def test_window_size_ok():
@@ -39,27 +39,42 @@ def test_get_intervals(interval_length):
     assert all(start <= entry[1] <= end for entry in result)
 
 
-def test_get_time_intervals():
+def test_get_time_intervals_single_interval():
     # arrange
+    tzinfo = datetime.timezone.utc
     granularity = 86400  # daily
-    params_short_interval = {
-        "start": datetime.datetime(2021, 1, 1, 0, 0, 0).isoformat(),
-        "end": datetime.datetime(2021, 1, 1, 0, 1, 40).isoformat(),
-        "granularity": granularity,
-    }
-    params_multiple_intervals = {
-        "start": datetime.datetime(2020, 1, 1, 0, 0, 0).isoformat(),
-        "end": datetime.datetime(2021, 1, 1, 0, 0, 0).isoformat(),
+    start = datetime.datetime(2021, 1, 1, 0, 0, 0, tzinfo=tzinfo)
+    end = datetime.datetime(2021, 1, 1, 0, 1, 40, tzinfo=tzinfo)
+    params = {
+        "start": start.isoformat(),
+        "end": end.isoformat(),
         "granularity": granularity,
     }
 
     # act
-    results_short = get_time_intervals(params_short_interval)
-    results_multiple = get_time_intervals(params_multiple_intervals)
+    results = get_time_intervals(params)
 
     # assert
-    assert results_short == [(datetime.datetime(2021, 1, 1, 0, 0), datetime.datetime(2021, 1, 1, 0, 1, 40))]
-    assert results_multiple == [
-        (datetime.datetime(2020, 3, 7, 0, 0), datetime.datetime(2021, 1, 1, 0, 0)),
-        (datetime.datetime(2020, 1, 1, 0, 0), datetime.datetime(2020, 3, 7, 0, 0)),
+    assert results == [(start, end)]
+
+
+def test_get_time_intervals_multiple_intervals():
+    # arrange
+    tzinfo = datetime.timezone.utc
+    granularity = 86400  # daily
+    start = datetime.datetime(2020, 1, 1, 0, 0, 0, tzinfo=tzinfo)
+    end = datetime.datetime(2021, 1, 1, 0, 0, 0, tzinfo=tzinfo)
+    params = {
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "granularity": granularity,
+    }
+
+    # act
+    results = get_time_intervals(params)
+
+    # assert
+    assert results == [
+        (datetime.datetime(2020, 3, 7, 0, 0, tzinfo=tzinfo), end),
+        (start, datetime.datetime(2020, 3, 7, 0, 0, tzinfo=tzinfo)),
     ]
