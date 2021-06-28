@@ -11,7 +11,7 @@ install_requires = [
     'requests',
     'websocket-client',
     'pymongo',
-    'sortedcontainers'
+    'sortedcontainers',
     'iso8601'
 ]
 
