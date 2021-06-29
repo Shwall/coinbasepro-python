@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-version = '2.1.28'
+version = '2.2.0'
 
 url = 'https://github.com/teleprint-me/coinbasepro-python'
 tag = f'/archive/refs/tags/{version}.zip'
