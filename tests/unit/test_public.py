@@ -15,6 +15,7 @@ class TestPublicClient(object):
         assert hasattr(public_client, 'products')
         assert hasattr(public_client, 'currencies')
         assert hasattr(public_client, 'time')
+        assert hasattr(public_client, 'history')
 
     def test_public_products(self, public_client):
         products = public_client.products
@@ -40,6 +41,12 @@ class TestPublicClient(object):
         assert isinstance(time, cbpro.messenger.Subscriber)
         assert isinstance(time, cbpro.public.Time)
         assert hasattr(time, 'get')
+
+    def test_public_history(self, public_client):
+        history = public_client.history
+        assert isinstance(history, cbpro.messenger.Subscriber)
+        assert isinstance(history, cbpro.public.History)
+        assert hasattr(history, 'candles')
 
 
 class TestPublicProducts(Teardown):
@@ -139,3 +146,25 @@ class TestPublicTime(Teardown):
         response = public_client.time.get()
         assert isinstance(response, dict)
         assert 'iso' in response
+
+
+class TestPublicHistory(Teardown):
+    @pytest.mark.parametrize('n_days', [1, 300, 301, 600, 601])
+    def test_candles(self, public_client, n_days):
+        """Test that we can get more than 300 candles despite the limit of 300 candles/request."""
+        # arrange
+        product_id = 'BTC-USD'
+        granularity = 86400  # daily
+        end = datetime.datetime.now()
+        start = end - datetime.timedelta(days=n_days)
+        params = {"start": start.isoformat(), "end": end.isoformat(), "granularity": granularity}
+
+        # act
+        response = public_client.history.candles(product_id, params)
+
+        # assert
+        assert isinstance(response, list)
+        assert isinstance(response[0], list)
+        assert len(response) == n_days
+        assert len(response[0]) == 6
+

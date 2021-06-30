@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-version = '2.1.28'
+version = '2.2.0'
 
 url = 'https://github.com/teleprint-me/coinbasepro-python'
 tag = f'/archive/refs/tags/{version}.zip'
@@ -11,7 +11,8 @@ install_requires = [
     'requests',
     'websocket-client',
     'pymongo',
-    'sortedcontainers'
+    'sortedcontainers',
+    'iso8601'
 ]
 
 tests_require = [
