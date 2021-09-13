@@ -1,5 +1,19 @@
 # coinbasepro-python
 
+## Archived
+
+This repository has been archived indefinitely. 
+
+If you're looking for something similar that is barebones and gets the grunt work out of the way, then you can look at my [`ledger-api`](https://github.com/teleprint-me/ledger-api) repository. I will be working on, and maintaining, that project instead.
+
+The [`ledger-api`](https://github.com/teleprint-me/ledger-api) repository is a minimalist backend REST API for my main [`ledger`](https://github.com/teleprint-me/ledger) repository. It currently supports `Coinbase Pro` and `Kraken` as of this final commit.
+
+Future plans are to support `Coinbase`, `Gemini`, `1inch`, `Uniswap`, `Coinbase Wallet`, `Metamask Wallet`, anything `Web3` related, and more.
+
+Thank you for the positive feedback. The community has been helpful and welcoming. I apologize for any inconvienence this may have caused. 
+
+Best Regards.
+
 ## About
 
 [![Build Status](https://travis-ci.com/teleprint-me/coinbasepro-python.svg?branch=master)](https://travis-ci.com/teleprint-me/coinbasepro-python)
@@ -1663,40 +1677,3 @@ directory run:
 ```bash
 python -m pytest
 ```
-
-# Change Log
-
-*1.1.2* **Current PyPI release**
-- Refactor project for Coinbase Pro
-- Major overhaul on how pagination is handled
-
-*1.0*
-- The first release that is not backwards compatible
-- Refactored to follow PEP 8 Standards
-- Improved Documentation
-
-*0.3*
-- Added crypto and LTC deposit & withdraw (undocumented).
-- Added support for Margin trading (undocumented).
-- Enhanced functionality of the WebsocketClient.
-- Soft launch of the OrderBook (undocumented).
-- Minor bug squashing & syntax improvements.
-
-*0.2.2*
-- Added additional API functionality such as cancelAll() and ETH withdrawal.
-
-*0.2.1*
-- Allowed ```WebsocketClient``` to operate intuitively and restructured example
-workflow.
-
-*0.2.0*
-- Renamed project to GDAX-Python
-- Merged Websocket updates to handle errors and reconnect.
-
-*0.1.2*
-- Updated JSON handling for increased compatibility among some users.
-- Added support for payment methods, reports, and Coinbase user accounts.
-- Other compatibility updates.
-
-*0.1.1b2*
-- Original PyPI Release.
