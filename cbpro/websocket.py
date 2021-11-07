@@ -80,8 +80,7 @@ class WebsocketStream(object):
     def receive(self) -> dict:
         if self.connected:
             payload = self.connection.recv()
-            if payload:
-                return json.loads(payload)
+            return json.loads(payload)
         return dict()
 
     def ping(self) -> None:
